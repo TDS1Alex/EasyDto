@@ -1,6 +1,6 @@
+import { Attribute } from "../../class/attribute";
 import { Class } from "../../class/class";
 import { Multiplicity } from "../../class/multiplicity";
-import { Parameter } from "../../class/parameter";
 import { Type } from "../../class/type";
 import { CSharpTypeDict } from "./csharp-type-dict";
 
@@ -18,11 +18,13 @@ export class CSharpMapper {
     }
 
     private static generateParameters(currentClass: Class, dtoText: string): string {
-        const indent = '    ';
-
-        currentClass.parameters.forEach(param => {
-            dtoText = this.generateAttribute(param, dtoText);
-            let propertyText = `${indent}public ${CSharpTypeDict[param.type]} ${param.name} { get; set; }\n`;
+        currentClass.parameters.forEach(param => {        
+            const isCollection = param.multiplicity === Multiplicity.Collection;
+            const isIgnore = param.type === Type.Number;
+            const attribute = new Attribute(param.required, isCollection, false, isIgnore, param.maxLenght);
+            
+            dtoText += attribute.getAttribute();
+            let propertyText = this.getProperty(param.name, isCollection, false, param.type);
             propertyText = this.lineBreak(currentClass.parameters, param, propertyText);
 
             dtoText += propertyText;
@@ -31,46 +33,28 @@ export class CSharpMapper {
         return dtoText;
     }
 
-    private static generateAttribute(param: Parameter, dtoText: string): string {
-        const indent = '    ';
-
-        if (param.required && param.type !== Type.Number) {
-            dtoText += `${indent}[Required]\n`;
-        }
-
-        if (param.required && param.multiplicity === Multiplicity.Collection) {
-            dtoText += `${indent}[MinLength(1)]\n`;
-        }
-
-        if (param.maxLenght) {
-            dtoText += `${indent}[MaxLength(${param.maxLenght})]\n`;
-        }
-        
-        return dtoText;
-    }
-
     private static generateObjects(currentClass: Class, dtoText: string): string {
-        const indent = '    ';
-
+        dtoText += '\n';
         currentClass.objects.forEach(object => {
-            dtoText += '\n';
+            const isCollection = object.multiplicity === Multiplicity.Collection;
+            const attribute = new Attribute(object.required, isCollection, true, false, null);
 
-            if (object.required && object.multiplicity === Multiplicity.Collection) {
-                dtoText += `${indent}[MinLength(1)]\n`;
-            }
-
-            if (object.multiplicity === Multiplicity.Collection) {
-                dtoText += `${indent}public ICollection<${object.name}> ${object.name} { get; set; }\n`;
-            }
-
-            if (object.multiplicity === Multiplicity.Singular) {
-                dtoText += `${indent}public ${object.name} ${object.name} { get; set; }\n`;
-            }
-
+            dtoText += attribute.getAttribute();
+            dtoText += this.getProperty(object.name, isCollection, true);
             dtoText = this.lineBreak(currentClass.objects, object, dtoText);
         });
 
         return dtoText;
+    }
+
+    private static getProperty(name: string, isCollection: boolean, isObject: boolean, type: Type | null = null) {
+        const indent = '    ';
+        const objectCollection = isObject && isCollection ? `ICollection<${name}>` : null;
+        const objectSingular = isObject && !isCollection ? `${name}` : null;
+        const parameterType = !isObject && type ? `${CSharpTypeDict[type!]}` : null;
+        const types = [objectCollection, objectSingular, parameterType].filter(Boolean);
+
+        return `${indent}public ${types} ${name} { get; set; }\n`;
     }
 
     private static lineBreak<T>(entities: T[], currentEntity: T, text: string):string {
