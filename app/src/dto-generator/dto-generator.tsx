@@ -54,7 +54,7 @@ function DtoGenerator() {
     };
 
     function getCurrentClass(stack: Class[], level: number): Class {
-        const i  = level !== 0 ? stack.findIndex(c => c.level === level - 1) 
+        const i  = level !== 0 ? stack.findLastIndex (c => c.level === level - 1) 
                                : 0;
         return stack[i] || null;
     }

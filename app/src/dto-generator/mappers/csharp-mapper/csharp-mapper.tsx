@@ -1,31 +1,32 @@
 import { Attribute } from "../../class/attribute";
 import { Class } from "../../class/class";
 import { Multiplicity } from "../../class/multiplicity";
+import { Parameter } from "../../class/parameter";
 import { Type } from "../../class/type";
 import { CSharpTypeDict } from "./csharp-type-dict";
 
 export class CSharpMapper {
     public static generateCSharpDto(currentClass: Class, dtoText: string) {
         dtoText = `public class ${currentClass.name}\n{\n`;
-        dtoText = this.generateParameters(currentClass, dtoText);
+        dtoText = this.generateParameters(currentClass.parameters, dtoText);
 
         if (currentClass.objects) {
-            dtoText = this.generateObjects(currentClass, dtoText);
+            dtoText = this.generateObjects(currentClass.objects, dtoText);
         }
 
         dtoText += `}\n\n`;
         return dtoText;
     }
 
-    private static generateParameters(currentClass: Class, dtoText: string): string {
-        currentClass.parameters.forEach(param => {        
+    private static generateParameters(parameters: Parameter[], dtoText: string): string {
+        parameters.forEach(param => {
             const isCollection = param.multiplicity === Multiplicity.Collection;
             const isIgnore = param.type === Type.Number;
             const attribute = new Attribute(param.required, isCollection, false, isIgnore, param.maxLenght);
-            
+
             dtoText += attribute.getAttribute();
             let propertyText = this.getProperty(param.name, isCollection, false, param.type);
-            propertyText = this.lineBreak(currentClass.parameters, param, propertyText);
+            propertyText = this.lineBreak(parameters, param, propertyText);
 
             dtoText += propertyText;
         });
@@ -33,15 +34,15 @@ export class CSharpMapper {
         return dtoText;
     }
 
-    private static generateObjects(currentClass: Class, dtoText: string): string {
+    private static generateObjects(objects: Class[], dtoText: string): string {
         dtoText += '\n';
-        currentClass.objects.forEach(object => {
+        objects.forEach(object => {
             const isCollection = object.multiplicity === Multiplicity.Collection;
-            const attribute = new Attribute(object.required, isCollection, true, false, null);
+            const attribute = new Attribute(object.required, isCollection, true, false);
 
             dtoText += attribute.getAttribute();
             dtoText += this.getProperty(object.name, isCollection, true);
-            dtoText = this.lineBreak(currentClass.objects, object, dtoText);
+            dtoText = this.lineBreak(objects, object, dtoText);
         });
 
         return dtoText;
