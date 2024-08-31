@@ -1,6 +1,7 @@
 import { Class } from "../class/class";
 import { Technology } from "../class/technology";
-import { CSharpMapper } from "../mappers/csharp-mapper/csharp-mapper";
+import { CSharpMapper } from "../mappers/csharp/csharp-mapper";
+import { JavaScriptMapper } from "../mappers/javascript/javascript-mapper";
 
 export class GenerateDtoService {
     public static generateAllDto(classes: Class[], technology: Technology): string {
@@ -14,11 +15,14 @@ export class GenerateDtoService {
                 break;
 
             case Technology.JavaScript:
+                classes.forEach(curentClass => {
+                    dtoText += JavaScriptMapper.generateJavaScriptDto(curentClass, dtoText);
+                });
                 break;
                 
             case Technology.Grpc:
                 break;
-                
+
             default:
                 classes.forEach(curentClass => {
                     dtoText += CSharpMapper.generateCSharpDto(curentClass, dtoText);

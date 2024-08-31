@@ -26,7 +26,7 @@ export class CSharpMapper {
 
             dtoText += attribute.getAttribute();
             let propertyText = this.getProperty(param.name, isCollection, false, param.type);
-            propertyText = this.lineBreak(parameters, param, propertyText);
+            propertyText = this.lineBreak(parameters, param, propertyText, false);
 
             dtoText += propertyText;
         });
@@ -42,7 +42,7 @@ export class CSharpMapper {
 
             dtoText += attribute.getAttribute();
             dtoText += this.getProperty(object.name, isCollection, true);
-            dtoText = this.lineBreak(objects, object, dtoText);
+            dtoText = this.lineBreak(objects, object, dtoText, true);
         });
 
         return dtoText;
@@ -58,9 +58,10 @@ export class CSharpMapper {
         return `${indent}public ${types} ${name} { get; set; }\n`;
     }
 
-    private static lineBreak<T>(entities: T[], currentEntity: T, text: string):string {
+    private static lineBreak<T>(entities: T[], currentEntity: T, text: string, isObject: boolean): string {
         const currentEntityIndex = entities.findIndex(p => p === currentEntity);
-        if (currentEntityIndex !== entities?.length - 1) {
+        if (currentEntityIndex !== entities?.length - 1 || 
+            currentEntityIndex === entities?.length - 1 && isObject) {
             text += '\n';
         }
         return text;
