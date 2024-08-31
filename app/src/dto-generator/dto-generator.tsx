@@ -4,13 +4,19 @@ import { ChangeEvent, useState } from "react";
 import { CreateClassOrParameterService } from "./services/create-class-or-parameter-service";
 import { GenerateDtoService } from "./services/generate-dto-service";
 import { Class } from "./class/class";
+import { TechnologyDict } from './dictionaries/technology-dict';
 
 function DtoGenerator() {
     const [inputValue, setInputValue] = useState('');
     const [outputValue, setOutputValue] = useState('');
+    const [selectedTechnology, setSelectedTechnology] = useState('');
 
-    const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    const handleTextAreaChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         setInputValue(event.target.value);
+    };
+
+    const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
+        setSelectedTechnology(event.target.value);
     };
 
     const handleProcessClick = () => {
@@ -50,7 +56,7 @@ function DtoGenerator() {
             parentClass = null;
         });
 
-        setOutputValue(GenerateDtoService.generateAllDto(stack!, ''));
+        setOutputValue(GenerateDtoService.generateAllDto(stack!, TechnologyDict[selectedTechnology]));
     };
 
     function getCurrentClass(stack: Class[], level: number): Class {
@@ -64,8 +70,15 @@ function DtoGenerator() {
             <div className="header">
                 <h1>EasyDto</h1>
             </div>
+            <div className="input-container">
+                <select className="select" name="technology" value={selectedTechnology} onChange={handleSelectChange}>
+                    <option value="CSharp">CSharp</option>
+                    <option value="JavaScript">JavaScript</option>
+                    <option value="Grpc">Grpc</option>
+                </select>
+            </div>
             <div className="text-area-container">
-                <textarea className="text-area" value={inputValue} onChange={handleInputChange} />
+                <textarea name="text-area" className="text-area" value={inputValue} onChange={handleTextAreaChange} />
                 <textarea className="text-area" value={outputValue} readOnly />
             </div>
             <button className="process-button" onClick={handleProcessClick}>Обработать</button>
