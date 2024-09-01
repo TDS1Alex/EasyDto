@@ -1,6 +1,7 @@
 import { Class } from "../class/class";
 import { Technology } from "../class/technology";
 import { CSharpMapper } from "../mappers/csharp/csharp-mapper";
+import { GrpcMapper } from "../mappers/grpc/grpc-mapper";
 import { JavaScriptMapper } from "../mappers/javascript/javascript-mapper";
 
 export class GenerateDtoService {
@@ -21,6 +22,9 @@ export class GenerateDtoService {
                 break;
                 
             case Technology.Grpc:
+                classes.forEach(curentClass => {
+                    dtoText += GrpcMapper.generateGrpcDto(curentClass, dtoText);
+                });
                 break;
 
             default:

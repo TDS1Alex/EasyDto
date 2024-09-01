@@ -60,9 +60,17 @@ function DtoGenerator() {
     };
 
     function getCurrentClass(stack: Class[], level: number): Class {
-        const i  = level !== 0 ? stack.findLastIndex (c => c.level === level - 1) 
+        const i  = level !== 0 ? findLastIndex(stack, c => c.level === level - 1) 
                                : 0;
         return stack[i] || null;
+    }
+
+    function findLastIndex<T>(array: T[], predicate: (value: T, index: number, obj: T[]) => boolean): number {
+        const reversedIndex = [...array].reverse().findIndex(predicate);
+        if (reversedIndex === -1) {
+          return -1;
+        }
+        return array.length - 1 - reversedIndex;
     }
 
     return (
