@@ -1,26 +1,46 @@
 import './dto-generator.css';
 import { ChangeEvent, useState } from "react";
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCopy, faCheck } from '@fortawesome/free-solid-svg-icons';
+
 import { CreateClassOrParameterService } from "./services/create-class-or-parameter-service";
 import { GenerateDtoService } from "./services/generate-dto-service";
-import { Class } from "./class/class";
 import { TechnologyDict } from './dictionaries/technology-dict';
+import { Class } from "./class/class";
 
 function DtoGenerator() {
-    const [inputValue, setInputValue] = useState('');
+    const [textAreaValue, setTextAreaValue] = useState('');
     const [outputValue, setOutputValue] = useState('');
     const [selectedTechnology, setSelectedTechnology] = useState('');
+    const [nameDtoValue, setNameDtoValue] = useState('');
+    const [isCopied, setIsCopied] = useState(false);
+
+    const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setNameDtoValue(event.target.value);
+    };
 
     const handleTextAreaChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        setInputValue(event.target.value);
+        setTextAreaValue(event.target.value);
     };
 
     const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
         setSelectedTechnology(event.target.value);
     };
 
+    const handleCopyToClipboard = () => {
+        navigator.clipboard.writeText(outputValue)
+            .then(() => {
+                setIsCopied(true);
+                setTimeout(() => setIsCopied(false), 2000);
+            })
+            .catch((error) => {
+                console.error('Ошибка при копировании в буфер обмена:', error);
+            });
+    };
+
     const handleProcessClick = () => {
-        const lines = inputValue.split('\n').filter(e => !RegExp("сортировка|навигация", "i").test(e));
+        const lines = textAreaValue.split('\n').filter(e => !RegExp("сортировка|навигация", "i").test(e));
         let parentClass: Class | null = null;
         let currentClass: Class | null = null;
         let stack: Class[] = [];
@@ -79,17 +99,26 @@ function DtoGenerator() {
                 <h1>EasyDto</h1>
             </div>
             <div className="input-container">
-                <select className="select" name="technology" value={selectedTechnology} onChange={handleSelectChange}>
-                    <option value="CSharp">CSharp</option>
+                <input type='text' value={nameDtoValue} onChange={handleInputChange}
+                    className='base-input-elements-style input-name-dto' placeholder='Напишите название ДТО'/>
+                <select className="base-input-elements-style select" name="technology" value={selectedTechnology} onChange={handleSelectChange}>
+                    <option value="CSharp">C#</option>
                     <option value="JavaScript">JavaScript</option>
                     <option value="Grpc">Grpc</option>
                 </select>
             </div>
             <div className="text-area-container">
-                <textarea name="text-area" className="text-area" value={inputValue} onChange={handleTextAreaChange} />
-                <textarea className="text-area" value={outputValue} readOnly />
+                <textarea name="text-area" className="text-area" value={textAreaValue} onChange={handleTextAreaChange} />
+                <div className="output-container">
+                    <textarea className="text-area" value={outputValue} readOnly />
+                    <button className="copy-button" onClick={handleCopyToClipboard}>
+                        <FontAwesomeIcon icon={isCopied ? faCheck : faCopy} />
+                    </button>
+                </div>
             </div>
-            <button className="process-button" onClick={handleProcessClick}>Обработать</button>
+            <div className="buttons-container">
+                <button className="process-button" onClick={handleProcessClick}>Обработать</button>
+            </div>
         </div>
     );
 }

@@ -34,12 +34,12 @@ body {
 .input-container {
     display: flex;
     align-items: stretch;
+
     width: 100%;
     margin-bottom: 20px;
 }
 
-.select {
-    width: 200px;
+.base-input-elements-style {
     margin: 0 10px;
     padding: 10px;
 
@@ -51,17 +51,28 @@ body {
     cursor: pointer;
 }
 
-.select:focus {
+.select {
+    width: 100px;
+}
+
+.input-name-dto {
+    width: 200px;
+}
+
+.select:focus,
+.input-name-dto:focus {
     outline: none;
     border-color: #007bff;
 }
 
 .text-area-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: stretch;
     width: 100%;
     height: 100%;
+   
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
 }
 
 .text-area {
@@ -74,7 +85,7 @@ body {
     background-color: #fff;
     color: #000;
     border: 1px solid #ddd;
-    border-radius: 5px; 
+    border-radius: 5px;
 }
 
 .text-area:focus {
@@ -82,9 +93,43 @@ body {
     border-color: #007bff;
 }
 
+.output-container {
+    display: flex;
+    position: relative;
+
+    flex: 1;
+    margin: 0 10px;
+}
+
+.copy-button {
+    position: absolute;
+    bottom: 1px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2em;
+    color: #000;
+}
+.copy-button:hover {
+    color: #007bff;
+}
+.copy-button:focus {
+    outline: none;
+}
+
+.buttons-container {
+    width: 100%;
+    margin-bottom: 20px;
+
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+}
+
 .process-button {
     padding: 10px 20px;
-    margin-top: 20px;
+    margin: 20px 10px 0 10px;
+
     background-color: #007bff;
     color: white;
     border: none;
