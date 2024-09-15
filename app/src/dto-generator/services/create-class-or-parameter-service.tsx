@@ -3,6 +3,7 @@ import { TypeDict } from "../dictionaries/type-dict";
 import { Parameter } from "../class/parameter";
 import { Class } from "../class/class";
 import { Multiplicity } from "../class/multiplicity";
+import { Enum } from "../class/enum";
 
 export class CreateClassOrParameterService {
 
@@ -13,11 +14,17 @@ export class CreateClassOrParameterService {
     public static createClass(parts: string[], level: number): Class {
         const name = CreateClassOrParameterService.getName(parts, 'объект');
         const required = parts.some(p => RegExp("^1").test(p));
-
-        const multiplicityKey = parts.find(e => MultiplicityDict[e])!;
-        const multiplicity = MultiplicityDict[multiplicityKey];
+        const multiplicity = this.getMultiplicity(parts);
 
         return new Class(name, required, multiplicity, level);
+    }
+
+    public static createEnum(parts: string[]): Enum {
+        const name = CreateClassOrParameterService.getName(parts, 'перечисление');
+        const required = parts.some(p => RegExp("^1").test(p));
+        const multiplicity = this.getMultiplicity(parts);
+
+        return new Enum(name, required, multiplicity);
     }
 
     public static createParameter(parts: string[]): Parameter {
@@ -26,9 +33,7 @@ export class CreateClassOrParameterService {
 
         this.combineDateTimeParts(parts);
 
-        const multiplicityKey = parts.find(e => MultiplicityDict[e])!;
-        const multiplicity = MultiplicityDict[multiplicityKey];
-
+        const multiplicity = this.getMultiplicity(parts);
         const maxLenght = this.getMaxLenght(parts);
 
         const typeKey = [...parts].reverse().find(e => TypeDict[e])!;
@@ -66,5 +71,10 @@ export class CreateClassOrParameterService {
     private static getName(elements: string[], typeKey: string): string {
         const i = elements.lastIndexOf(typeKey);
         return elements.slice(0, i).join(' ').replace(/-/g, '').trim();
+    }
+
+    private static getMultiplicity(parts: string[]): Multiplicity {
+        const multiplicityKey = parts.find(e => MultiplicityDict[e])!;
+        return MultiplicityDict[multiplicityKey];
     }
 }

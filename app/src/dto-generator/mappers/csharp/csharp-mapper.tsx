@@ -1,67 +1,105 @@
 import { Attribute } from "../../class/attribute";
 import { Class } from "../../class/class";
+import { Enum } from "../../class/enum";
 import { Multiplicity } from "../../class/multiplicity";
 import { Parameter } from "../../class/parameter";
 import { Type } from "../../class/type";
 import { CSharpTypeDict } from "./csharp-type-dict";
 
 export class CSharpMapper {
-    public static generateCSharpDto(currentClass: Class, dtoText: string) {
+    public static generateCSharpDto(currentClass: Class, dtoText: string, needComments: boolean) {
         dtoText = `public class ${currentClass.name}\n{\n`;
-        dtoText = this.generateParameters(currentClass.parameters, dtoText);
+        dtoText = this.generateParameters(currentClass.parameters, dtoText, needComments);
 
-        if (currentClass.objects) {
-            dtoText = this.generateObjects(currentClass.objects, dtoText);
+        if(currentClass.enums && currentClass.enums.length != 0) {
+            dtoText = this.generateEnums(currentClass.enums, dtoText, needComments);
+        }
+
+        if (currentClass.objects && currentClass.objects.length != 0) {
+            dtoText = this.generateObjects(currentClass.objects, dtoText, needComments);
         }
 
         dtoText += `}\n\n`;
         return dtoText;
     }
 
-    private static generateParameters(parameters: Parameter[], dtoText: string): string {
+    private static generateParameters(parameters: Parameter[], dtoText: string, needComments: boolean): string {
         parameters.forEach(param => {
             const isCollection = param.multiplicity === Multiplicity.Collection;
-            const isIgnore = param.type === Type.Number;
+            const isIgnore = param.type !== Type.String;
             const attribute = new Attribute(param.required, isCollection, false, isIgnore, param.maxLenght);
 
+            if (needComments) {
+                dtoText = this.getComment(param.name, dtoText);
+            }
+            
             dtoText += attribute.getAttribute();
-            let propertyText = this.getProperty(param.name, isCollection, false, param.type);
-            propertyText = this.lineBreak(parameters, param, propertyText, false);
-
-            dtoText += propertyText;
+            dtoText += this.getProperty(param.name, param.required, isCollection, false, false, param.type);
+            dtoText = this.lineBreak(parameters, param, dtoText);
         });
 
         return dtoText;
     }
 
-    private static generateObjects(objects: Class[], dtoText: string): string {
+    private static generateObjects(objects: Class[], dtoText: string, needComments: boolean): string {
         dtoText += '\n';
         objects.forEach(object => {
             const isCollection = object.multiplicity === Multiplicity.Collection;
             const attribute = new Attribute(object.required, isCollection, true, false);
 
+            if (needComments) {
+                dtoText = this.getComment(object.name, dtoText);
+            }
+          
             dtoText += attribute.getAttribute();
-            dtoText += this.getProperty(object.name, isCollection, true);
-            dtoText = this.lineBreak(objects, object, dtoText, true);
+            dtoText += this.getProperty(object.name, true, isCollection, true);
+            dtoText = this.lineBreak(objects, object, dtoText);
         });
 
         return dtoText;
     }
 
-    private static getProperty(name: string, isCollection: boolean, isObject: boolean, type: Type | null = null) {
-        const indent = '    ';
-        const objectCollection = isObject && isCollection ? `ICollection<${name}>` : null;
-        const objectSingular = isObject && !isCollection ? `${name}` : null;
-        const parameterType = !isObject && type ? `${CSharpTypeDict[type!]}` : null;
-        const types = [objectCollection, objectSingular, parameterType].filter(Boolean);
+    private static generateEnums(enums: Enum[], dtoText: string, needComments: boolean): string {
+        dtoText += '\n';
+        enums.forEach(currentEnum => {
+            const isCollection = currentEnum.multiplicity === Multiplicity.Collection;
+            const attribute = new Attribute(currentEnum.required, isCollection, true, false);
 
-        return `${indent}public ${types} ${name} { get; set; }\n`;
+            if (needComments) {
+                dtoText = this.getComment(currentEnum.name, dtoText);
+            }
+
+            dtoText += attribute.getAttribute();
+            dtoText += this.getProperty(currentEnum.name, currentEnum.required, isCollection, false, true);
+            dtoText = this.lineBreak(enums, currentEnum, dtoText);
+        });
+
+        return dtoText;
     }
 
-    private static lineBreak<T>(entities: T[], currentEntity: T, text: string, isObject: boolean): string {
+    private static getComment(name: string, dtoText: string): string {
+        const indent = '    ';
+        dtoText += `${indent}/// <summary>\n`;
+        dtoText += `${indent}/// ${name}\n`;
+        dtoText += `${indent}/// </summary>\n`;
+        return dtoText;
+    }
+
+    private static getProperty(name: string, isRequired: boolean, isCollection: boolean, isObject: boolean, 
+        isEnum: boolean = false, type: Type | null = null) {
+        const indent = '    ';
+        const objectCollection = (isObject || isEnum) && isCollection ? `ICollection<${name}>` : null;
+        const objectSingular = (isObject || isEnum) && !isCollection ? `${name}` : null;
+        const parameterType = !isObject && !isEnum && type ? `${CSharpTypeDict[type!]}` : null;
+        const isOptionalField = !isRequired && !isCollection && type !== Type.String ? "?" : "";
+        const types = [objectCollection, objectSingular, parameterType].filter(Boolean);
+
+        return `${indent}public ${types}${isOptionalField} ${name} { get; set; }\n`;
+    }
+
+    private static lineBreak<T>(entities: T[], currentEntity: T, text: string): string {
         const currentEntityIndex = entities.findIndex(p => p === currentEntity);
-        if (currentEntityIndex !== entities?.length - 1 || 
-            currentEntityIndex === entities?.length - 1 && isObject) {
+        if (currentEntityIndex !== entities?.length - 1) {
             text += '\n';
         }
         return text;

@@ -46,9 +46,10 @@ function DtoGenerator() {
         let stack: Class[] = [];
         let rootClassCreated = false;
 
-        lines.forEach(line => {
+        lines.filter(item => item !== "").forEach(line => {
             const parts = line.trim().split(/\s+/);
             const isObject = RegExp("объект").test(line);
+            const isEnum = RegExp("перечисление").test(line);
             const level = parts.filter(part => part === '-').length;
             currentClass = getCurrentClass(stack, level);
 
@@ -69,14 +70,18 @@ function DtoGenerator() {
                     parentClass.addObject(currentClass);
                 }
                 rootClassCreated = true;
-            } else {
+            }
+            else if (isEnum) {
+                currentClass.addEnum(parts);
+            }
+            else {
                 currentClass.addParameter(parts);
             }
 
             parentClass = null;
         });
 
-        setOutputValue(GenerateDtoService.generateAllDto(stack!, TechnologyDict[selectedTechnology]));
+        setOutputValue(GenerateDtoService.generateAllDto(stack!, TechnologyDict[selectedTechnology], true));
     };
 
     function getCurrentClass(stack: Class[], level: number): Class {
