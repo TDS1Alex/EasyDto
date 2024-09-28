@@ -89,12 +89,13 @@ export class CSharpMapper {
         isEnum: boolean = false, type: Type | null = null) {
         const indent = '    ';
         const objectCollection = (isObject || isEnum) && isCollection ? `ICollection<${name}>` : null;
+        const propertyMassive = !isObject && !isEnum && isCollection ? `[]` : "";
         const objectSingular = (isObject || isEnum) && !isCollection ? `${name}` : null;
         const parameterType = !isObject && !isEnum && type ? `${CSharpTypeDict[type!]}` : null;
         const isOptionalField = !isRequired && !isCollection && type !== Type.String ? "?" : "";
         const types = [objectCollection, objectSingular, parameterType].filter(Boolean);
 
-        return `${indent}public ${types}${isOptionalField} ${name} { get; set; }\n`;
+        return `${indent}public ${types}${propertyMassive}${isOptionalField} ${name} { get; set; }\n`;
     }
 
     private static lineBreak<T>(entities: T[], currentEntity: T, text: string): string {
