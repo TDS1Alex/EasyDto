@@ -7,8 +7,8 @@ import { Enum } from "../class/enum";
 
 export class CreateClassOrParameterService {
 
-    public static createDefaultClass(): Class {
-        return new Class('DefaultName', false, Multiplicity.Singular, 0);
+    public static createDefaultClass(name: string): Class {
+        return new Class(name ? name : "DefaultName", false, Multiplicity.Singular, 0);
     }
     
     public static createClass(parts: string[], level: number): Class {

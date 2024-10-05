@@ -58,7 +58,7 @@ function DtoGenerator() {
             }
 
             if (!isObject && !rootClassCreated) {
-                currentClass = CreateClassOrParameterService.createDefaultClass();
+                currentClass = CreateClassOrParameterService.createDefaultClass(nameDtoValue);
                 stack.push(currentClass);
                 rootClassCreated = true;
             }
