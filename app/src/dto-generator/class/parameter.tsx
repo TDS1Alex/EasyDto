@@ -11,7 +11,7 @@ export class Parameter {
 
     constructor(name: string,
                 translatedName: string,
-                required: boolean,            
+                required: boolean,
                 multiplicityType: Multiplicity,
                 parameterType: Type,
                 maxLenght: number | null) 
