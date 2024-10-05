@@ -39,49 +39,48 @@ function DtoGenerator() {
             });
     };
 
-    const handleProcessClick = () => {
+    const handleProcessClick = async () => {
         const lines = textAreaValue.split('\n').filter(e => !RegExp("сортировка|навигация", "i").test(e));
         let parentClass: Class | null = null;
         let currentClass: Class | null = null;
         let stack: Class[] = [];
         let rootClassCreated = false;
-
-        lines.filter(item => item !== "").forEach(line => {
+    
+        for (const line of lines.filter(item => item !== "")) {
             const parts = line.trim().split(/\s+/);
             const isObject = RegExp("объект").test(line);
             const isEnum = RegExp("перечисление").test(line);
             const level = parts.filter(part => part === '-').length;
             currentClass = getCurrentClass(stack, level);
-
+    
             if (isObject && currentClass && currentClass.level < level) {
                 parentClass = currentClass;
             }
-
+    
             if (!isObject && !rootClassCreated) {
-                currentClass = CreateClassOrParameterService.createDefaultClass(nameDtoValue);
+                currentClass = await CreateClassOrParameterService.createDefaultClass(nameDtoValue);
                 stack.push(currentClass);
                 rootClassCreated = true;
             }
-
+    
             if (isObject) {
-                currentClass = CreateClassOrParameterService.createClass(parts, level);
+                currentClass = await CreateClassOrParameterService.createClass(parts, level);
                 stack.push(currentClass);
                 if (parentClass) {
                     parentClass.addObject(currentClass);
                 }
                 rootClassCreated = true;
+            } else if (isEnum) {
+                await currentClass.addEnum(parts);
+            } else {
+                await currentClass.addParameter(parts);
             }
-            else if (isEnum) {
-                currentClass.addEnum(parts);
-            }
-            else {
-                currentClass.addParameter(parts);
-            }
-
+    
             parentClass = null;
-        });
-
-        setOutputValue(GenerateDtoService.generateAllDto(stack!, TechnologyDict[selectedTechnology], true));
+        }
+    
+        const result = await GenerateDtoService.generateAllDto(stack!, TechnologyDict[selectedTechnology], true);
+        setOutputValue(result);
     };
 
     function getCurrentClass(stack: Class[], level: number): Class {

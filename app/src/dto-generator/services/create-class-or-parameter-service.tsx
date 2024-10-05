@@ -4,30 +4,35 @@ import { Parameter } from "../class/parameter";
 import { Class } from "../class/class";
 import { Multiplicity } from "../class/multiplicity";
 import { Enum } from "../class/enum";
+import { AITranslatorService } from "./ai-translator-service";
 
 export class CreateClassOrParameterService {
 
-    public static createDefaultClass(name: string): Class {
-        return new Class(name ? name : "DefaultName", false, Multiplicity.Singular, 0);
+    public static async createDefaultClass(name: string): Promise<Class> { 
+        const translatedName = await AITranslatorService.translateName(name);
+        return new Class(name ? name : "Default Name", translatedName, false, Multiplicity.Singular, 0);
     }
     
-    public static createClass(parts: string[], level: number): Class {
+    public static async createClass(parts: string[], level: number): Promise<Class> {
         const name = CreateClassOrParameterService.getName(parts, 'объект');
+        const translatedName = await AITranslatorService.translateName(name);
         const required = parts.some(p => RegExp("^1").test(p));
         const multiplicity = this.getMultiplicity(parts);
-
-        return new Class(name, required, multiplicity, level);
+        
+        return new Class(name, translatedName, required, multiplicity, level);
     }
 
-    public static createEnum(parts: string[]): Enum {
+    public static async createEnum(parts: string[]): Promise<Enum> {
         const name = CreateClassOrParameterService.getName(parts, 'перечисление');
+        const translatedName = await AITranslatorService.translateName(name);
+
         const required = parts.some(p => RegExp("^1").test(p));
         const multiplicity = this.getMultiplicity(parts);
-
-        return new Enum(name, required, multiplicity);
+        
+        return new Enum(name, translatedName, required, multiplicity);
     }
 
-    public static createParameter(parts: string[]): Parameter {
+    public static async createParameter(parts: string[]): Promise<Parameter> {
         const multiplicityKeyIndex = parts.findIndex(e => MultiplicityDict[e]);       
         parts = parts.slice(0, multiplicityKeyIndex + 1);
 
@@ -40,9 +45,10 @@ export class CreateClassOrParameterService {
         const type = TypeDict[typeKey];
         
         const name = this.getName(parts, typeKey);
+        const translatedName = await AITranslatorService.translateName(name);
         const required = parts.some(p => RegExp("^1").test(p));
-        
-        return new Parameter(name, required, multiplicity, type, maxLenght);
+
+        return new Parameter(name, translatedName, required, multiplicity, type, maxLenght);
     }
 
     private static combineDateTimeParts(parts: string[]) {

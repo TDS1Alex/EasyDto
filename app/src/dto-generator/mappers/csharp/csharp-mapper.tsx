@@ -8,7 +8,7 @@ import { CSharpTypeDict } from "./csharp-type-dict";
 
 export class CSharpMapper {
     public static generateCSharpDto(currentClass: Class, dtoText: string, needComments: boolean) {
-        dtoText = `public class ${currentClass.name}\n{\n`;
+        dtoText = `public class ${currentClass.translatedName}\n{\n`;
         dtoText = this.generateParameters(currentClass.parameters, dtoText, needComments);
 
         if(currentClass.enums && currentClass.enums.length != 0) {
@@ -34,7 +34,7 @@ export class CSharpMapper {
             }
             
             dtoText += attribute.getAttribute();
-            dtoText += this.getProperty(param.name, param.required, isCollection, false, false, param.type);
+            dtoText += this.getProperty(param.translatedName, param.required, isCollection, false, false, param.type);
             dtoText = this.lineBreak(parameters, param, dtoText);
         });
 
@@ -52,7 +52,7 @@ export class CSharpMapper {
             }
           
             dtoText += attribute.getAttribute();
-            dtoText += this.getProperty(object.name, true, isCollection, true);
+            dtoText += this.getProperty(object.translatedName, true, isCollection, true);
             dtoText = this.lineBreak(objects, object, dtoText);
         });
 
@@ -70,7 +70,7 @@ export class CSharpMapper {
             }
 
             dtoText += attribute.getAttribute();
-            dtoText += this.getProperty(currentEnum.name, currentEnum.required, isCollection, false, true);
+            dtoText += this.getProperty(currentEnum.translatedName, currentEnum.required, isCollection, false, true);
             dtoText = this.lineBreak(enums, currentEnum, dtoText);
         });
 

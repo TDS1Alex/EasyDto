@@ -5,6 +5,7 @@ import { Parameter } from "./parameter";
 
 export class Class {
     name: string;
+    translatedName: string;
     required: boolean = false;
     multiplicity: Multiplicity;
     level: number;
@@ -13,11 +14,13 @@ export class Class {
     enums: Enum[];
 
     constructor(name: string,
+                translatedName: string,
                 required: boolean,
                 multiplicityType: Multiplicity,
                 level: number) 
     {
         this.name =  name;
+        this.translatedName = translatedName;
         this.required = required;
         this.multiplicity = multiplicityType;
         this.level = level;
@@ -26,12 +29,12 @@ export class Class {
         this.enums = [];
     }
 
-    addParameter(parts: string[]) {
-        this.parameters.push(CreateClassOrParameterService.createParameter(parts));
+    async addParameter(parts: string[]) {
+        this.parameters.push(await CreateClassOrParameterService.createParameter(parts));
     }
 
-    addEnum(parts: string[]) {
-        this.enums.push(CreateClassOrParameterService.createEnum(parts));
+    async addEnum(parts: string[]) {
+        this.enums.push(await CreateClassOrParameterService.createEnum(parts));
     }
 
     addObject(object: Class) {
