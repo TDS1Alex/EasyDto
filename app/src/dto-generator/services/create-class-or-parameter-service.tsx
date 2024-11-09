@@ -9,8 +9,11 @@ import { AITranslatorService } from "./ai-translator-service";
 export class CreateClassOrParameterService {
 
     public static async createDefaultClass(name: string): Promise<Class> { 
-        const translatedName = await AITranslatorService.translateName(name);
-        return new Class(name ? name : "Default Name", translatedName, false, Multiplicity.Singular, 0);
+        if(name) {
+            const translatedName = await AITranslatorService.translateName(name);
+            return new Class(name, translatedName, false, Multiplicity.Singular, 0);
+        }
+        return new Class("Default Name", "Default Name", false, Multiplicity.Singular, 0);
     }
     
     public static async createClass(parts: string[], level: number): Promise<Class> {
@@ -33,16 +36,16 @@ export class CreateClassOrParameterService {
     }
 
     public static async createParameter(parts: string[]): Promise<Parameter> {
-        const multiplicityKeyIndex = parts.findIndex(e => MultiplicityDict[e]);       
+        const multiplicityKeyIndex = parts.findIndex(e => MultiplicityDict[e]);
         parts = parts.slice(0, multiplicityKeyIndex + 1);
 
-        this.combineDateTimeParts(parts);
+        const dateTimeType = this.combineDateTimeParts(parts);
 
         const multiplicity = this.getMultiplicity(parts);
         const maxLenght = this.getMaxLenght(parts);
 
         const typeKey = [...parts].reverse().find(e => TypeDict[e])!;
-        const type = TypeDict[typeKey];
+        const type = dateTimeType ? dateTimeType : TypeDict[typeKey] ;  
         
         const name = this.getName(parts, typeKey);
         const translatedName = await AITranslatorService.translateName(name);
@@ -55,8 +58,10 @@ export class CreateClassOrParameterService {
         const i = parts.indexOf("время");
         if (i !== -1 && parts[i - 1] === "и" && parts[i - 2] === "дата") {
             parts[i] = "дата и время";
-            parts.splice(i - 2, 2);   
+            parts.splice(i - 2, 2); 
+            return TypeDict[parts[i]];
         }
+        return null;
     }
 
     private static getMaxLenght(parts: string[]) {
@@ -76,7 +81,8 @@ export class CreateClassOrParameterService {
 
     private static getName(elements: string[], typeKey: string): string {
         const i = elements.lastIndexOf(typeKey);
-        return elements.slice(0, i).join(' ').replace(/-/g, '').trim();
+        let name = elements.slice(0, i).join(' ').replace(/-/g, '').trim();
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
     private static getMultiplicity(parts: string[]): Multiplicity {
