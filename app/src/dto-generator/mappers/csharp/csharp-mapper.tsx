@@ -8,10 +8,20 @@ import { CSharpTypeDict } from "./csharp-type-dict";
 
 export class CSharpMapper {
     public static generateCSharpDto(currentClass: Class, dtoText: string, needComments: boolean) {
-        dtoText = `public class ${currentClass.translatedName}\n{\n`;
+
+        if (needComments) {
+            let className: string = `/// <summary>\n`;
+            className += `/// ${currentClass.name}\n`;
+            className += `/// </summary>\n`;
+            className += `public class ${currentClass.translatedName}\n{\n`;
+            dtoText = className;
+        } else {
+            dtoText = `public class ${currentClass.translatedName}\n{\n`;
+        }
+        
         dtoText = this.generateParameters(currentClass.parameters, dtoText, needComments);
 
-        if(currentClass.enums && currentClass.enums.length != 0) {
+        if (currentClass.enums && currentClass.enums.length != 0) {
             dtoText = this.generateEnums(currentClass.enums, dtoText, needComments);
         }
 
