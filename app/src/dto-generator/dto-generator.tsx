@@ -15,6 +15,7 @@ function DtoGenerator() {
     const [selectedTechnology, setSelectedTechnology] = useState('');
     const [nameDtoValue, setNameDtoValue] = useState('');
     const [isCopied, setIsCopied] = useState(false);
+    const [commentsEnabled, setCommentsEnabled] = useState(false);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setNameDtoValue(event.target.value);
@@ -25,7 +26,12 @@ function DtoGenerator() {
     };
 
     const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-        setSelectedTechnology(event.target.value);
+        const value = event.target.value;
+        setSelectedTechnology(value);
+
+        if (value !== 'CSharp') {
+            setCommentsEnabled(false);
+        }
     };
 
     const handleCopyToClipboard = () => {
@@ -37,6 +43,10 @@ function DtoGenerator() {
             .catch((error) => {
                 console.error('Ошибка при копировании в буфер обмена:', error);
             });
+    };
+
+    const handleToggle = () => {
+        setCommentsEnabled(!commentsEnabled);
     };
 
     const handleProcessClick = async () => {
@@ -79,7 +89,7 @@ function DtoGenerator() {
             parentClass = null;
         }
     
-        const result = await GenerateDtoService.generateAllDto(stack!, TechnologyDict[selectedTechnology], true);
+        const result = await GenerateDtoService.generateAllDto(stack!, TechnologyDict[selectedTechnology], commentsEnabled);
         setOutputValue(result);
     };
 
@@ -110,6 +120,13 @@ function DtoGenerator() {
                     <option value="JavaScript">JavaScript</option>
                     <option value="Grpc">Grpc</option>
                 </select>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px' }}>
+                    <span>Комментарии</span>
+                    <label className="switch">
+                        <input type="checkbox" checked={commentsEnabled} onChange={handleToggle} disabled={selectedTechnology !== 'CSharp'}/>
+                        <span className="slider"></span>
+                    </label>
+                </div>
             </div>
             <div className="text-area-container">
                 <textarea name="text-area" className="text-area" value={textAreaValue} onChange={handleTextAreaChange} />
