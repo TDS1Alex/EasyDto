@@ -12,7 +12,7 @@ const Input: React.FC<InputProps> = ({ value, onChange, placeholder }) => {
         <input type='text' 
                value={value} 
                onChange={onChange} 
-               className='base-input-elements-style input-name-dto' 
+               className='input-name-dto' 
                placeholder={placeholder}/>
     );
 };
