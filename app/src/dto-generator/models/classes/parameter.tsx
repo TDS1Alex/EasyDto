@@ -1,5 +1,5 @@
-import { Multiplicity } from "./multiplicity";
-import { Type } from "./type";
+import { Multiplicity } from "../enums/multiplicity";
+import { Type } from "../enums/type";
 
 export class Parameter {
     name: string;

@@ -1,4 +1,4 @@
-import { Multiplicity } from "./multiplicity";
+import { Multiplicity } from "../enums/multiplicity";
 
 export class Enum {
     name: string;

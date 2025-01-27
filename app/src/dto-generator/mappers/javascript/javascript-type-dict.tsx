@@ -1,4 +1,4 @@
-import { Type } from "../../class/type";
+import { Type } from "../../models";
 import { JavaScriptType } from "./javascript-type";
 
 export const JavaScriptTypeDict: {[key in Type]: JavaScriptType} = {

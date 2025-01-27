@@ -1,4 +1,4 @@
-import { Type } from "../../class/type";
+import { Type } from "../../models";
 import { GrpcRequiredType } from "./grpc-required-type";
 
 export const GrpcRequiredTypeDict: {[key in Type]: GrpcRequiredType} = {

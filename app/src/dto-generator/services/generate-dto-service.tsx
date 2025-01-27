@@ -1,8 +1,5 @@
-import { Class } from "../class/class";
-import { Technology } from "../class/technology";
-import { CSharpMapper } from "../mappers/csharp/csharp-mapper";
-import { GrpcMapper } from "../mappers/grpc/grpc-mapper";
-import { JavaScriptMapper } from "../mappers/javascript/javascript-mapper";
+import { Class, Technology } from "../models";
+import { CSharpMapper, GrpcMapper, JavaScriptMapper } from "../mappers";
 
 export class GenerateDtoService {
     public static generateAllDto(classes: Class[], technology: Technology, needComments: boolean) {

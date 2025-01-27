@@ -1,4 +1,4 @@
-import { Technology } from "../class/technology";
+import { Technology } from "../enums/technology";
 
 export const TechnologyDict: { [key: string]: Technology } = {
     "CSharp": Technology.CSharp,

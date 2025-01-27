@@ -1,6 +1,6 @@
-import { CreateClassOrParameterService } from "../services/create-class-or-parameter-service";
+import { CreateClassOrParameterService } from "../../services/create-class-or-parameter-service";
 import { Enum } from "./enum";
-import { Multiplicity } from "./multiplicity";
+import { Multiplicity } from "../enums/multiplicity";
 import { Parameter } from "./parameter";
 
 export class Class {

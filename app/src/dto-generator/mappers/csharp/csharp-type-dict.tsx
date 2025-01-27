@@ -1,4 +1,4 @@
-import { Type } from "../../class/type";
+import { Type } from "../../models";
 import { CSharpType } from "./csharp-type";
 
 export const CSharpTypeDict: {[key in Type]: CSharpType} = {

@@ -1,9 +1,4 @@
-import { Attribute } from "../../class/attribute";
-import { Class } from "../../class/class";
-import { Enum } from "../../class/enum";
-import { Multiplicity } from "../../class/multiplicity";
-import { Parameter } from "../../class/parameter";
-import { Type } from "../../class/type";
+import { Class, Parameter, Enum, Type, Multiplicity, Attribute } from "../../models";
 import { CSharpTypeDict } from "./csharp-type-dict";
 
 export class CSharpMapper {

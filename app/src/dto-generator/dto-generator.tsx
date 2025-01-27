@@ -5,10 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy, faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import { Input, Select, Switch } from './components';
-import { CreateClassOrParameterService } from "./services/create-class-or-parameter-service";
-import { GenerateDtoService } from "./services/generate-dto-service";
-import { TechnologyDict } from './dictionaries/technology-dict';
-import { Class } from "./class/class";
+import { CreateClassOrParameterService, GenerateDtoService } from "./services";
+import { Class, TechnologyDict } from './models';
 
 function DtoGenerator() {
     const [textAreaValue, setTextAreaValue] = useState('');

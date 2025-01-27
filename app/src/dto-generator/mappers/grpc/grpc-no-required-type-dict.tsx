@@ -1,4 +1,4 @@
-import { Type } from "../../class/type";
+import { Type } from "../../models";
 import { GrpcNoRequiredType } from "./grpc-no-required-type";
 
 export const GrpcNoRequiredTypeDict: {[key in Type]: GrpcNoRequiredType} = {

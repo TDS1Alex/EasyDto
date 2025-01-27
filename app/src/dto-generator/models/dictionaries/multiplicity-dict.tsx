@@ -1,4 +1,4 @@
-import { Multiplicity } from "../class/multiplicity";
+import { Multiplicity } from "../enums/multiplicity";
 
 export const MultiplicityDict: { [key: string]: Multiplicity } = {
     "1": Multiplicity.Singular,

@@ -1,4 +1,4 @@
-import { Type } from "../class/type";
+import { Type } from "../enums/type";
 
 export const TypeDict: { [key: string]: Type } = {
     "число": Type.Number,

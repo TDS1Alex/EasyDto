@@ -1,6 +1,4 @@
-import { Class } from "../../class/class";
-import { Multiplicity } from "../../class/multiplicity";
-import { Type } from "../../class/type";
+import { Class, Multiplicity, Type } from "../../models";
 import { GrpcRequiredTypeDict } from "./grpc-required-type-dict";
 import { GrpcNoRequiredTypeDict } from "./grpc-no-required-type-dict";
 

@@ -1,9 +1,4 @@
-import { MultiplicityDict } from "../dictionaries/multiplicity-dict";
-import { TypeDict } from "../dictionaries/type-dict";
-import { Parameter } from "../class/parameter";
-import { Class } from "../class/class";
-import { Multiplicity } from "../class/multiplicity";
-import { Enum } from "../class/enum";
+import { Class, Parameter, Enum, Multiplicity, TypeDict, MultiplicityDict } from "../models";
 import { AITranslatorService } from "./ai-translator-service";
 
 export class CreateClassOrParameterService {
