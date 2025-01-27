@@ -1,0 +1,17 @@
+.input-name-dto {
+    width: 200px;
+    margin: 0 10px;
+    padding: 10px;
+
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.input-name-dto:focus {
+    outline: none;
+    border-color: #007bff;
+}

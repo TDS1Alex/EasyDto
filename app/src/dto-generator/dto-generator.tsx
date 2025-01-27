@@ -4,6 +4,7 @@ import { ChangeEvent, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy, faCheck } from '@fortawesome/free-solid-svg-icons';
 
+import { Input, Select, Switch } from './components';
 import { CreateClassOrParameterService } from "./services/create-class-or-parameter-service";
 import { GenerateDtoService } from "./services/generate-dto-service";
 import { TechnologyDict } from './dictionaries/technology-dict';
@@ -12,7 +13,7 @@ import { Class } from "./class/class";
 function DtoGenerator() {
     const [textAreaValue, setTextAreaValue] = useState('');
     const [outputValue, setOutputValue] = useState('');
-    const [selectedTechnology, setSelectedTechnology] = useState('');
+    const [selectedTechnology, setSelectedTechnology] = useState('CSharp');
     const [nameDtoValue, setNameDtoValue] = useState('');
     const [isCopied, setIsCopied] = useState(false);
     const [commentsEnabled, setCommentsEnabled] = useState(false);
@@ -107,26 +108,21 @@ function DtoGenerator() {
         return array.length - 1 - reversedIndex;
     }
 
+    const options = [
+        { value: 'CSharp', label: 'C#' },
+        { value: 'JavaScript', label: 'JavaScript' },
+        { value: 'Grpc', label: 'Grpc' },
+    ];
+
     return (
         <div className="dto-generator-container">
             <div className="header">
                 <h1>EasyDto</h1>
             </div>
             <div className="input-container">
-                <input type='text' value={nameDtoValue} onChange={handleInputChange}
-                    className='base-input-elements-style input-name-dto' placeholder='Напишите название ДТО'/>
-                <select className="base-input-elements-style select" name="technology" value={selectedTechnology} onChange={handleSelectChange}>
-                    <option value="CSharp">C#</option>
-                    <option value="JavaScript">JavaScript</option>
-                    <option value="Grpc">Grpc</option>
-                </select>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px' }}>
-                    <span>Комментарии</span>
-                    <label className="switch">
-                        <input type="checkbox" checked={commentsEnabled} onChange={handleToggle} disabled={selectedTechnology !== 'CSharp'}/>
-                        <span className="slider"></span>
-                    </label>
-                </div>
+                <Input value={nameDtoValue} onChange={handleInputChange} placeholder="Напишите название ДТО"/>
+                <Select value={selectedTechnology} onChange={handleSelectChange} options={options}/>
+                <Switch checked={commentsEnabled} onChange={handleToggle} disabled={selectedTechnology !== 'CSharp'}/>
             </div>
             <div className="text-area-container">
                 <textarea name="text-area" className="text-area" value={textAreaValue} onChange={handleTextAreaChange} />
