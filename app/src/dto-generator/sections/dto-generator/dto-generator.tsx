@@ -4,9 +4,9 @@ import { ChangeEvent, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy, faCheck } from '@fortawesome/free-solid-svg-icons';
 
-import { Input, Select, Switch } from './components';
-import { CreateClassOrParameterService, GenerateDtoService } from "./services";
-import { Class, TechnologyDict } from './models';
+import { Input, Select, Switch } from '../../components';
+import { CreateClassOrParameterService, GenerateDtoService } from "../../services";
+import { Class, TechnologyDict } from '../../models';
 
 function DtoGenerator() {
     const [textAreaValue, setTextAreaValue] = useState('');
@@ -114,9 +114,6 @@ function DtoGenerator() {
 
     return (
         <div className="dto-generator-container">
-            <div className="header">
-                <h1>EasyDto</h1>
-            </div>
             <div className="input-container">
                 <Input value={nameDtoValue} onChange={handleInputChange} placeholder="Напишите название ДТО"/>
                 <Select value={selectedTechnology} onChange={handleSelectChange} options={options}/>
