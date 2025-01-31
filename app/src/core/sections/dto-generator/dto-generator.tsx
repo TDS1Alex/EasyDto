@@ -8,13 +8,27 @@ import { Input, Select, Switch } from '../../components';
 import { CreateClassOrParameterService, GenerateDtoService } from "../../services";
 import { Class, TechnologyDict } from '../../models';
 
-function DtoGenerator() {
-    const [textAreaValue, setTextAreaValue] = useState('');
-    const [outputValue, setOutputValue] = useState('');
-    const [selectedTechnology, setSelectedTechnology] = useState('CSharp');
-    const [nameDtoValue, setNameDtoValue] = useState('');
+interface DtoGeneratorProps {
+    nameDtoValue: string;
+    setNameDtoValue: (value: string) => void;
+    selectedTechnology: string;
+    setSelectedTechnology: (value: string) => void;
+    commentsEnabled: boolean;
+    setCommentsEnabled: (value: boolean) => void;
+    textAreaValue: string;
+    setTextAreaValue: (value: string) => void;
+    outputValue: string;
+    setOutputValue: (value: string) => void;
+}
+
+function DtoGenerator({ nameDtoValue, setNameDtoValue,
+                        selectedTechnology, setSelectedTechnology,
+                        commentsEnabled, setCommentsEnabled,
+                        textAreaValue, setTextAreaValue,
+                        outputValue, setOutputValue, 
+    }: DtoGeneratorProps) {
+    
     const [isCopied, setIsCopied] = useState(false);
-    const [commentsEnabled, setCommentsEnabled] = useState(false);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setNameDtoValue(event.target.value);
