@@ -35,8 +35,8 @@ function App() {
                 outputValue={outputValue} setOutputValue={setOutputValue}
               />
             )}
-            {activeSection === 'ai-train' && <Settings />}
-            {activeSection === 'settings' && <AITrain />}
+            {activeSection === 'ai-train' && <AITrain />}
+            {activeSection === 'settings' && <Settings />}
           </div>
         </div>
       </div>
