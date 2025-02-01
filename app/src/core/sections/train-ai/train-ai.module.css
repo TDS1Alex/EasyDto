@@ -1,0 +1,39 @@
+.buttonsContainer {
+    width: 100%;
+    margin-bottom: 20px;
+
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.processButton {
+    padding: 10px 20px;
+    margin: 20px 10px 0 10px;
+
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.processButton:hover {
+    background-color: #0056b3;
+}
+
+.textAreaContainer {
+    width: 100%;
+    height: 100%;
+   
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+}
+
+@media (max-width: 600px) {
+    .textAreaContainer {
+        flex-direction: column;
+    }
+}

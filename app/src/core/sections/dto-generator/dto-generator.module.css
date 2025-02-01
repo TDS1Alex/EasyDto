@@ -1,4 +1,4 @@
-.dto-generator-container {
+.dtoGeneratorContainer {
     height: 100%;
     width: 100%;
 
@@ -9,7 +9,7 @@
     box-sizing: border-box;
 }
 
-.input-container {
+.inputContainer {
     width: 100%;
     margin-bottom: 20px;
 
@@ -17,7 +17,7 @@
     align-items: stretch;
 }
 
-.text-area-container {
+.textAreaContainer {
     width: 100%;
     height: 100%;
    
@@ -27,25 +27,7 @@
     align-items: stretch;
 }
 
-.text-area {
-    flex: 1;
-    margin: 0 10px;
-    padding: 10px;
-    resize: none;
-
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-    color: #000;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-.text-area:focus {
-    outline: none;
-    border-color: #007bff;
-}
-
-.output-container {
+.outputContainer {
     flex: 1;
     margin: 0 10px;
 
@@ -53,7 +35,7 @@
     position: relative;
 }
 
-.copy-button {
+.copyButton {
     padding: 0;
     height: 24px;
     width: 24px;
@@ -67,14 +49,14 @@
     cursor: pointer;
     color: #000;
 }
-.copy-button:hover {
+.copyButton:hover {
     color: #007bff;
 }
-.copy-button:focus {
+.copyButton:focus {
     outline: none;
 }
 
-.buttons-container {
+.buttonsContainer {
     width: 100%;
     margin-bottom: 20px;
 
@@ -83,7 +65,7 @@
     flex-direction: row;
 }
 
-.process-button {
+.processButton {
     padding: 10px 20px;
     margin: 20px 10px 0 10px;
 
@@ -94,20 +76,16 @@
     cursor: pointer;
 }
 
-.process-button:hover {
+.processButton:hover {
     background-color: #0056b3;
 }
 
 @media (max-width: 600px) {
-    .input-container {
+    .inputContainer {
         flex-direction: column;
     }
 
-    .text-area-container {
+    .textAreaContainer {
         flex-direction: column;
-    }
-
-    .text-area {
-        margin: 10px 0;
     }
 }

@@ -1,10 +1,9 @@
-import './dto-generator.css';
 import { ChangeEvent, useState } from "react";
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy, faCheck } from '@fortawesome/free-solid-svg-icons';
 
-import { Input, Select, Switch } from '../../components';
+import styles from './dto-generator.module.css';
+import { Input, Select, Switch, TextArea } from '../../components';
 import { CreateClassOrParameterService, GenerateDtoService } from "../../services";
 import { Class, TechnologyDict } from '../../models';
 
@@ -127,23 +126,23 @@ function DtoGenerator({ nameDtoValue, setNameDtoValue,
     ];
 
     return (
-        <div className="dto-generator-container">
-            <div className="input-container">
+        <div className={styles.dtoGeneratorContainer}>
+            <div className={styles.inputContainer}>
                 <Input value={nameDtoValue} onChange={handleInputChange} placeholder="Напишите название ДТО"/>
                 <Select value={selectedTechnology} onChange={handleSelectChange} options={options}/>
                 <Switch checked={commentsEnabled} onChange={handleToggle} disabled={selectedTechnology !== 'CSharp'}/>
             </div>
-            <div className="text-area-container">
-                <textarea name="text-area" className="text-area" value={textAreaValue} onChange={handleTextAreaChange} />
-                <div className="output-container">
+            <div className={styles.textAreaContainer}>
+                <TextArea value={textAreaValue} onChange={handleTextAreaChange} />
+                <div className={styles.outputContainer}>
                     <textarea className="text-area" value={outputValue} readOnly />
-                    <button className="copy-button" onClick={handleCopyToClipboard}>
+                    <button className={styles.copyButton} onClick={handleCopyToClipboard}>
                         <FontAwesomeIcon icon={isCopied ? faCheck : faCopy} />
                     </button>
                 </div>
             </div>
-            <div className="buttons-container">
-                <button className="process-button" onClick={handleProcessClick}>Обработать</button>
+            <div className={styles.buttonsContainer}>
+                <button className={styles.processButton} onClick={handleProcessClick}>Обработать</button>
             </div>
         </div>
     );

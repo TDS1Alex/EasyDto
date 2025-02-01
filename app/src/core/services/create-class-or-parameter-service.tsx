@@ -1,11 +1,11 @@
 import { Class, Parameter, Enum, Multiplicity, TypeDict, MultiplicityDict } from "../models";
-import { AITranslatorService } from "./ai-translator-service";
+import { AiService } from "./ai-service";
 
 export class CreateClassOrParameterService {
 
     public static async createDefaultClass(name: string): Promise<Class> { 
         if(name) {
-            const translatedName = await AITranslatorService.translateName(name);
+            const translatedName = await AiService.translateName(name);
             return new Class(name, translatedName, false, Multiplicity.Singular, 0);
         }
         return new Class("Default Name", "Default Name", false, Multiplicity.Singular, 0);
@@ -13,7 +13,7 @@ export class CreateClassOrParameterService {
     
     public static async createClass(parts: string[], level: number): Promise<Class> {
         const name = CreateClassOrParameterService.getName(parts, 'объект');
-        const translatedName = await AITranslatorService.translateName(name);
+        const translatedName = await AiService.translateName(name);
         const required = parts.some(p => RegExp("^1").test(p));
         const multiplicity = this.getMultiplicity(parts);
         
@@ -22,7 +22,7 @@ export class CreateClassOrParameterService {
 
     public static async createEnum(parts: string[]): Promise<Enum> {
         const name = CreateClassOrParameterService.getName(parts, 'перечисление');
-        const translatedName = await AITranslatorService.translateName(name);
+        const translatedName = await AiService.translateName(name);
 
         const required = parts.some(p => RegExp("^1").test(p));
         const multiplicity = this.getMultiplicity(parts);
@@ -43,7 +43,7 @@ export class CreateClassOrParameterService {
         const type = dateTimeType ? dateTimeType : TypeDict[typeKey] ;  
         
         const name = this.getName(parts, typeKey);
-        const translatedName = await AITranslatorService.translateName(name);
+        const translatedName = await AiService.translateName(name);
         const required = parts.some(p => RegExp("^1").test(p));
 
         return new Parameter(name, translatedName, required, multiplicity, type, maxLenght);

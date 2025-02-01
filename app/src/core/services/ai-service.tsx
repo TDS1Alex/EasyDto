@@ -1,4 +1,6 @@
-export class AITranslatorService {
+import { TrainAiRequest } from "../contracts/TrainAiRequest";
+
+export class AiService {
     public static path = 'http://127.0.0.1:5000';
 
     public static async translateName(name: string): Promise<string> {
@@ -20,7 +22,7 @@ export class AITranslatorService {
         });
     };
 
-    public static async trainAI(examples: string[]): Promise<string> {
+    public static async trainAi(examples: TrainAiRequest[]): Promise<string> {
         return fetch(`${this.path}/train`, {
             method: 'POST',
             headers: {

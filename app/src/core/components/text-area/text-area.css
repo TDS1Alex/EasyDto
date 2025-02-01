@@ -1,0 +1,23 @@
+.text-area {
+    flex: 1;
+    margin: 0 10px;
+    padding: 10px;
+    resize: none;
+
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.text-area:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+@media (max-width: 600px) {
+    .text-area {
+        margin: 10px 0;
+    }
+}

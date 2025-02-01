@@ -1,4 +1,4 @@
-import { DtoGenerator, AITrain, Settings } from '../core/sections';
+import { DtoGenerator, TrainAi, Settings } from '../core/sections';
 import './app.css';
 
 import { useState } from 'react';
@@ -6,12 +6,15 @@ import { useState } from 'react';
 function App() {
   const [activeSection, setActiveSection] = useState('dto-generator');
 
-  // Состояние для DtoGenerator
+  // Состояния для DtoGenerator
   const [nameDtoValue, setNameDtoValue] = useState('');
   const [selectedTechnology, setSelectedTechnology] = useState('CSharp');
   const [commentsEnabled, setCommentsEnabled] = useState(false);
-  const [textAreaValue, setTextAreaValue] = useState('');
+  const [textAreaDtoGeneratorValue, setTextAreaDtoGeneratorValue] = useState('');
   const [outputValue, setOutputValue] = useState('');
+
+  // Состояния для TrainAi
+  const [textAreaTrainAiValue, setTextAreaTrainAiValue] = useState('');
 
   return (
     <>
@@ -22,7 +25,7 @@ function App() {
         <div className="main-content">
           <div className="sidebar">
             <button onClick={() => setActiveSection('dto-generator')}>Генератор DTO</button>
-            <button onClick={() => setActiveSection('ai-train')}>Обучение ИИ</button>
+            <button onClick={() => setActiveSection('train-ai')}>Обучение ИИ</button>
             <button onClick={() => setActiveSection('settings')}>Настройки</button>
           </div>
           <div className="content">
@@ -31,11 +34,14 @@ function App() {
                 nameDtoValue={nameDtoValue} setNameDtoValue={setNameDtoValue}
                 selectedTechnology={selectedTechnology} setSelectedTechnology={setSelectedTechnology}
                 commentsEnabled={commentsEnabled} setCommentsEnabled={setCommentsEnabled}
-                textAreaValue={textAreaValue} setTextAreaValue={setTextAreaValue}
+                textAreaValue={textAreaDtoGeneratorValue} setTextAreaValue={setTextAreaDtoGeneratorValue}
                 outputValue={outputValue} setOutputValue={setOutputValue}
               />
             )}
-            {activeSection === 'ai-train' && <AITrain />}
+            {activeSection === 'train-ai' && (
+              <TrainAi 
+                textAreaValue={textAreaTrainAiValue} setTextAreaValue={setTextAreaTrainAiValue}
+              />)}
             {activeSection === 'settings' && <Settings />}
           </div>
         </div>
