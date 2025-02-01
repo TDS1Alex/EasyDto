@@ -1,4 +1,4 @@
-import { TrainAiRequest } from "../contracts/TrainAiRequest";
+import { TrainAiRequest } from "../contracts/train-ai-request";
 
 export class AiService {
     public static path = 'http://127.0.0.1:5000';

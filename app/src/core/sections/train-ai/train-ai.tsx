@@ -2,7 +2,7 @@ import { ChangeEvent } from "react";
 
 import styles from './train-ai.module.css';
 import { TextArea } from "../../components";
-import { TrainAiRequest } from "../../contracts/TrainAiRequest";
+import { TrainAiRequest } from "../../contracts/train-ai-request";
 import { AiService } from "../../services";
 
 interface TrainAiProps {
