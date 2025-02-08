@@ -32,12 +32,13 @@ function TrainAi({textAreaValue, setTextAreaValue}:TrainAiProps) {
         <div>
           <h2>Обучение ИИ</h2>
         </div>
-        
-        <div className={styles.textAreaContainer}>
-          <TextArea value={textAreaValue} onChange={handleTextAreaChange} />
-        </div>
-        <div className={styles.buttonsContainer}>
-          <button className={styles.processButton} onClick={handleProcessClick}>Обучить</button>
+        <div className={styles.workspaceContainer}>
+          <div className={styles.textAreaContainer}>
+            <TextArea value={textAreaValue} onChange={handleTextAreaChange} />
+          </div>
+          <div className={styles.buttonsContainer}>
+            <button className={styles.processButton} onClick={handleProcessClick}>Обучить</button>
+          </div>
         </div>
       </div>
     );

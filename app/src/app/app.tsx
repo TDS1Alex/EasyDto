@@ -1,4 +1,4 @@
-import { DtoGenerator, TrainAi, Settings } from '../core/sections';
+import { DtoGenerator, TrainAi, Settings, Hints } from '../core/sections';
 import './app.css';
 
 import { useState } from 'react';
@@ -27,6 +27,7 @@ function App() {
             <button onClick={() => setActiveSection('dto-generator')}>Генератор DTO</button>
             <button onClick={() => setActiveSection('train-ai')}>Обучение ИИ</button>
             <button onClick={() => setActiveSection('settings')}>Настройки</button>
+            <button onClick={() => setActiveSection('hints')}>Подсказки</button>
           </div>
           <div className="content">
           {activeSection === 'dto-generator' && (
@@ -43,6 +44,7 @@ function App() {
                 textAreaValue={textAreaTrainAiValue} setTextAreaValue={setTextAreaTrainAiValue}
               />)}
             {activeSection === 'settings' && <Settings />}
+            {activeSection === 'hints' && <Hints />}
           </div>
         </div>
       </div>

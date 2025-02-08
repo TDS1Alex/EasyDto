@@ -1,10 +1,18 @@
+.workspaceContainer {
+    width: 100%;
+    height: 100%;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .buttonsContainer {
     width: 100%;
     margin-bottom: 20px;
 
     display: flex;
     justify-content: center;
-    flex-direction: row;
 }
 
 .processButton {
@@ -23,13 +31,10 @@
 }
 
 .textAreaContainer {
-    width: 100%;
-    height: 100%;
-   
+    width: 50%;
+    height: 30vh;
+
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: stretch;
 }
 
 @media (max-width: 600px) {
