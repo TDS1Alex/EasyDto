@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy, faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import styles from './dto-generator.module.css';
-import { Input, Select, Switch, TextArea } from '../../components';
+import { Input, Select, Switch, TextArea, Spinner } from '../../components';
 import { CreateClassOrParameterService, GenerateDtoService } from "../../services";
 import { Class, TechnologyDict } from '../../models';
 
@@ -28,6 +28,7 @@ function DtoGenerator({ nameDtoValue, setNameDtoValue,
     }: DtoGeneratorProps) {
     
     const [isCopied, setIsCopied] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setNameDtoValue(event.target.value);
@@ -62,6 +63,7 @@ function DtoGenerator({ nameDtoValue, setNameDtoValue,
     };
 
     const handleProcessClick = async () => {
+        setLoading(true);
         const lines = textAreaValue.split('\n').filter(e => !RegExp("сортировка|навигация", "i").test(e));
         let parentClass: Class | null = null;
         let currentClass: Class | null = null;
@@ -103,6 +105,7 @@ function DtoGenerator({ nameDtoValue, setNameDtoValue,
     
         const result = await GenerateDtoService.generateAllDto(stack!, TechnologyDict[selectedTechnology], commentsEnabled);
         setOutputValue(result);
+        setLoading(false);
     };
 
     function getCurrentClass(stack: Class[], level: number): Class {
@@ -135,14 +138,17 @@ function DtoGenerator({ nameDtoValue, setNameDtoValue,
             <div className={styles.textAreaContainer}>
                 <TextArea value={textAreaValue} onChange={handleTextAreaChange} />
                 <div className={styles.outputContainer}>
-                    <textarea className="text-area" value={outputValue} readOnly />
+                    <textarea className={`${styles.textArea} ${loading ? styles.disabledTextArea : 'text-area'}`} value={outputValue} readOnly />
+                    {loading && <Spinner size={35} color="#000" />} {}
                     <button className={styles.copyButton} onClick={handleCopyToClipboard}>
                         <FontAwesomeIcon icon={isCopied ? faCheck : faCopy} />
                     </button>
                 </div>
             </div>
             <div className={styles.buttonsContainer}>
-                <button className={styles.processButton} onClick={handleProcessClick}>Обработать</button>
+                <button className={styles.processButton} onClick={handleProcessClick} disabled={loading}>
+                    {loading ? 'Обработка...' : 'Обработать'}
+                </button>
             </div>
         </div>
     );

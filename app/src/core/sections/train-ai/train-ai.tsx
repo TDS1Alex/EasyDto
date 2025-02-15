@@ -24,7 +24,7 @@ function TrainAi({textAreaValue, setTextAreaValue}:TrainAiProps) {
         return {input: value[0], output: value[1]} as TrainAiRequest
       });
 
-      //AiService.trainAi(request);
+      AiService.trainAi(request);
     };
 
     return (
