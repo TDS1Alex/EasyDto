@@ -90,13 +90,23 @@ export class CreateClassOrParameterService {
     }
 
     private static mergeWords(translatedName: string): string {
-        let articles : string[] = ["a", "an", "the", "is"];
-  
-        return translatedName
-            .split(' ')
-            .filter(word => !articles.includes(word.toLowerCase()))
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-            .join('')
-            .replace('.', '');
+        let words = translatedName.split(' ');
+        words = this.removeArticles(words);
+        words = this.setCapitalLetter(words);
+        translatedName = words.join('');
+        return this.removePunctuationMarks(translatedName);
+    }
+
+    private static removeArticles(words: string[]): string[] {
+        const articles : string[] = ["a", "an", "the", "is"];
+        return words.filter(word => !articles.includes(word.toLowerCase()));
+    }
+
+    private static setCapitalLetter(words: string[]): string[] {
+        return words.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+    }
+
+    private static removePunctuationMarks(word: string): string {
+        return word.replace(/[.,?!]/g, '');
     }
 }
