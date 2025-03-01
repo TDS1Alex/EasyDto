@@ -35,20 +35,6 @@
     position: relative;
 }
 
-.disabledTextArea {
-    flex: 1;
-    margin: 0 10px;
-    padding: 10px;
-    resize: none;
-
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    background-color: rgba(0, 0, 0, 0.1);
-    color: #000;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    pointer-events: none;
-}
-
 .copyButton {
     padding: 0;
     height: 24px;
@@ -94,6 +80,7 @@
     background-color: #0056b3;
 }
 
+/* Адаптация для мобильных устройств */
 @media (max-width: 600px) {
     .inputContainer {
         flex-direction: column;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
-import styles from './Spinner.module.css';
+import styles from './spinner.module.css';
 
 interface SpinnerProps {
     size?: number;

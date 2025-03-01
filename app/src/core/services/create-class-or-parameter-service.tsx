@@ -5,15 +5,18 @@ export class CreateClassOrParameterService {
 
     public static async createDefaultClass(name: string): Promise<Class> { 
         if(name) {
-            const translatedName = await AiService.translateName(name);
+            
+            let translatedName = await AiService.translateName(name);
+            translatedName = this.mergeWords(translatedName);
             return new Class(name, translatedName, false, Multiplicity.Singular, 0);
         }
-        return new Class("Default Name", "Default Name", false, Multiplicity.Singular, 0);
+        return new Class("DefaultName", "DefaultName", false, Multiplicity.Singular, 0);
     }
     
     public static async createClass(parts: string[], level: number): Promise<Class> {
-        const name = CreateClassOrParameterService.getName(parts, 'объект');
-        const translatedName = await AiService.translateName(name);
+        const name = CreateClassOrParameterService.getName(parts, 'объект');    
+        let translatedName = await AiService.translateName(name);
+        translatedName = this.mergeWords(translatedName);;
         const required = parts.some(p => RegExp("^1").test(p));
         const multiplicity = this.getMultiplicity(parts);
         
@@ -22,7 +25,8 @@ export class CreateClassOrParameterService {
 
     public static async createEnum(parts: string[]): Promise<Enum> {
         const name = CreateClassOrParameterService.getName(parts, 'перечисление');
-        const translatedName = await AiService.translateName(name);
+        let translatedName = await AiService.translateName(name);
+        translatedName = this.mergeWords(translatedName);
 
         const required = parts.some(p => RegExp("^1").test(p));
         const multiplicity = this.getMultiplicity(parts);
@@ -41,9 +45,10 @@ export class CreateClassOrParameterService {
 
         const typeKey = [...parts].reverse().find(e => TypeDict[e])!;
         const type = dateTimeType ? dateTimeType : TypeDict[typeKey] ;  
-        
+             
         const name = this.getName(parts, typeKey);
-        const translatedName = await AiService.translateName(name);
+        let translatedName = await AiService.translateName(name);
+        translatedName = this.mergeWords(translatedName);
         const required = parts.some(p => RegExp("^1").test(p));
 
         return new Parameter(name, translatedName, required, multiplicity, type, maxLenght);
@@ -76,12 +81,22 @@ export class CreateClassOrParameterService {
 
     private static getName(elements: string[], typeKey: string): string {
         const i = elements.lastIndexOf(typeKey);
-        let name = elements.slice(0, i).join(' ').replace(/-/g, '').trim();
-        return name.substring(0, 1).toUpperCase() + name.substring(1);
+        return elements.slice(0, i).join(' ').replace(/-/g, '').trim();
     }
 
     private static getMultiplicity(parts: string[]): Multiplicity {
         const multiplicityKey = parts.find(e => MultiplicityDict[e])!;
         return MultiplicityDict[multiplicityKey];
+    }
+
+    private static mergeWords(translatedName: string): string {
+        let articles : string[] = ["a", "an", "the", "is"];
+  
+        return translatedName
+            .split(' ')
+            .filter(word => !articles.includes(word.toLowerCase()))
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join('')
+            .replace('.', '');
     }
 }

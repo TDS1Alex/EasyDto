@@ -31,12 +31,17 @@
 }
 
 .textAreaContainer {
+    flex-grow: 1;
     width: 50%;
-    height: 30vh;
+    height: 50vh;
 
     display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
 }
 
+/* Адаптация для мобильных устройств */
 @media (max-width: 600px) {
     .textAreaContainer {
         flex-direction: column;

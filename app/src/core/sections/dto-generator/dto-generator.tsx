@@ -136,9 +136,9 @@ function DtoGenerator({ nameDtoValue, setNameDtoValue,
                 <Switch checked={commentsEnabled} onChange={handleToggle} disabled={selectedTechnology !== 'CSharp'}/>
             </div>
             <div className={styles.textAreaContainer}>
-                <TextArea value={textAreaValue} onChange={handleTextAreaChange} />
+                <TextArea value={textAreaValue} loading={loading} onChange={handleTextAreaChange} />
                 <div className={styles.outputContainer}>
-                    <textarea className={`${styles.textArea} ${loading ? styles.disabledTextArea : 'text-area'}`} value={outputValue} readOnly />
+                    <textarea className={`${styles.textArea} ${loading ? 'disabled-text-area' : 'text-area'}`} value={outputValue} readOnly />
                     {loading && <Spinner size={35} color="#000" />} {}
                     <button className={styles.copyButton} onClick={handleCopyToClipboard}>
                         <FontAwesomeIcon icon={isCopied ? faCheck : faCopy} />

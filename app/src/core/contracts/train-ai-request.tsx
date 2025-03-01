@@ -1,9 +1,7 @@
 export class TrainAiRequest {
-    input: string;
-    output: string;
+    examples: { input: string; output: string }[] = [];
 
-    constructor (input: string, output: string) {
-        this.input = input;
-        this.output = output;
+    public add(input: string, output: string) {
+        this.examples.push({input, output})
     }
 }

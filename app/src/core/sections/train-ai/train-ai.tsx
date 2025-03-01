@@ -1,7 +1,7 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
 
 import styles from './train-ai.module.css';
-import { TextArea } from "../../components";
+import { TextArea, Spinner } from "../../components";
 import { TrainAiRequest } from "../../contracts/train-ai-request";
 import { AiService } from "../../services";
 
@@ -11,20 +11,28 @@ interface TrainAiProps {
 }
 
 function TrainAi({textAreaValue, setTextAreaValue}:TrainAiProps) {
-
+    const [loading, setLoading] = useState(false);
     const handleTextAreaChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         setTextAreaValue(event.target.value);
     };
 
     const handleProcessClick = async () => {
-      const lines = textAreaValue.split(/[,;\n]/).filter(v => v != '');
-
-      let request = lines.map(keyValue => {
-        const value = keyValue.split('=').map(v => v.trim());
-        return {input: value[0], output: value[1]} as TrainAiRequest
-      });
-
-      AiService.trainAi(request);
+      setLoading(true);
+      try {
+        const lines = textAreaValue.split(/[,;\n]/).filter(v => v.trim() !== '');
+  
+        const request = new TrainAiRequest();
+        lines.forEach(keyValue => {
+          const [input, output] = keyValue.split('=').map(v => v.trim());
+          request.add(input, output);
+        });
+  
+        await AiService.trainAi(request);
+      } catch (error) {
+        console.error("Ошибка при обучении ИИ:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     return (
@@ -34,10 +42,13 @@ function TrainAi({textAreaValue, setTextAreaValue}:TrainAiProps) {
         </div>
         <div className={styles.workspaceContainer}>
           <div className={styles.textAreaContainer}>
-            <TextArea value={textAreaValue} onChange={handleTextAreaChange} />
+            <TextArea value={textAreaValue} loading={loading} onChange={handleTextAreaChange} />
+            {loading && <Spinner size={35} color="#000" />} {}
           </div>
           <div className={styles.buttonsContainer}>
-            <button className={styles.processButton} onClick={handleProcessClick}>Обучить</button>
+            <button className={styles.processButton} onClick={handleProcessClick} disabled={loading}>
+              {loading ? 'Обучение...' : 'Обучить'}
+            </button>
           </div>
         </div>
       </div>

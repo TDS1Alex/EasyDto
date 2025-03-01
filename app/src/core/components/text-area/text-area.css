@@ -1,14 +1,19 @@
-.text-area {
+.text-area,
+.disabled-text-area {
     flex: 1;
     margin: 0 10px;
     padding: 10px;
     resize: none;
-
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     background-color: #fff;
     color: #000;
     border: 1px solid #ddd;
     border-radius: 5px;
+    min-height: 150px;
+    font-family: inherit;
+    font-size: 16px;
+    height: 100%;
+    box-sizing: border-box;
 }
 
 .text-area:focus {
@@ -16,8 +21,16 @@
     border-color: #007bff;
 }
 
+.disabled-text-area {
+    background-color: rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+}
+
+/* Адаптация для мобильных устройств */
 @media (max-width: 600px) {
-    .text-area {
+    .text-area,
+    .disabled-text-area {
         margin: 10px 0;
+        height: 100%;
     }
 }

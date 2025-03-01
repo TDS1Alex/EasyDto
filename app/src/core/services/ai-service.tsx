@@ -22,13 +22,13 @@ export class AiService {
         });
     };
 
-    public static async trainAi(examples: TrainAiRequest[]): Promise<string> {
+    public static async trainAi(request: TrainAiRequest): Promise<string> {
         return fetch(`${this.path}/train`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(examples)
+            body: JSON.stringify(request)
         })
         .then(response => {
             return response.text()
