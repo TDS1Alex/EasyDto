@@ -1,5 +1,6 @@
 import { Class, Parameter, Enum, Multiplicity, TypeDict, MultiplicityDict } from "../models";
 import { AiService } from "./ai-service";
+import { StringSearchService } from "./string-search-service";
 
 export class CreateClassOrParameterService {
 
@@ -14,22 +15,23 @@ export class CreateClassOrParameterService {
     }
     
     public static async createClass(parts: string[], level: number): Promise<Class> {
-        const name = CreateClassOrParameterService.getName(parts, 'объект');    
+        
+        const name = StringSearchService.getName(parts, 'объект');       
         let translatedName = await AiService.translateName(name);
-        translatedName = this.mergeWords(translatedName);;
+        translatedName = this.mergeWords(translatedName);
         const required = parts.some(p => RegExp("^1").test(p));
-        const multiplicity = this.getMultiplicity(parts);
+        const multiplicity = StringSearchService.getMultiplicity(parts);
         
         return new Class(name, translatedName, required, multiplicity, level);
     }
 
     public static async createEnum(parts: string[]): Promise<Enum> {
-        const name = CreateClassOrParameterService.getName(parts, 'перечисление');
+        const name = StringSearchService.getName(parts, 'перечисление');
         let translatedName = await AiService.translateName(name);
         translatedName = this.mergeWords(translatedName);
 
         const required = parts.some(p => RegExp("^1").test(p));
-        const multiplicity = this.getMultiplicity(parts);
+        const multiplicity = StringSearchService.getMultiplicity(parts);
         
         return new Enum(name, translatedName, required, multiplicity);
     }
@@ -40,13 +42,13 @@ export class CreateClassOrParameterService {
 
         const dateTimeType = this.combineDateTimeParts(parts);
 
-        const multiplicity = this.getMultiplicity(parts);
-        const maxLenght = this.getMaxLenght(parts);
+        const multiplicity = StringSearchService.getMultiplicity(parts);
+        const maxLenght = StringSearchService.getMaxLenght(parts);
 
         const typeKey = [...parts].reverse().find(e => TypeDict[e])!;
-        const type = dateTimeType ? dateTimeType : TypeDict[typeKey] ;  
+        const type = dateTimeType ? dateTimeType : TypeDict[typeKey];  
              
-        const name = this.getName(parts, typeKey);
+        const name = StringSearchService.getName(parts, typeKey);
         let translatedName = await AiService.translateName(name);
         translatedName = this.mergeWords(translatedName);
         const required = parts.some(p => RegExp("^1").test(p));
@@ -64,31 +66,6 @@ export class CreateClassOrParameterService {
         return null;
     }
 
-    private static getMaxLenght(parts: string[]) {
-        const regex = new RegExp(/\(([0-9]+)\)/);
-        let maxLenght = null;
-        const line = parts.join(" ");
-        
-        if (regex.test(line)) {
-            const match = regex.exec(line)!;
-            maxLenght = Number.parseInt(match[1]);
-            
-            const i = parts.findIndex(element => regex.test(element));
-            parts[i] = parts[i].replace(regex, '');
-        }
-        return maxLenght;
-    }
-
-    private static getName(elements: string[], typeKey: string): string {
-        const i = elements.lastIndexOf(typeKey);
-        return elements.slice(0, i).join(' ').replace(/-/g, '').trim();
-    }
-
-    private static getMultiplicity(parts: string[]): Multiplicity {
-        const multiplicityKey = parts.find(e => MultiplicityDict[e])!;
-        return MultiplicityDict[multiplicityKey];
-    }
-
     private static mergeWords(translatedName: string): string {
         let words = translatedName.split(' ');
         words = this.removeArticles(words);
@@ -98,7 +75,7 @@ export class CreateClassOrParameterService {
     }
 
     private static removeArticles(words: string[]): string[] {
-        const articles : string[] = ["a", "an", "the", "is"];
+        const articles : string[] = ["a", "an", "the", "is", "to", "of"];
         return words.filter(word => !articles.includes(word.toLowerCase()));
     }
 

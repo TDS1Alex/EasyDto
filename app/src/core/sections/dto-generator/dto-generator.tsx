@@ -4,7 +4,7 @@ import { faCopy, faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import styles from './dto-generator.module.css';
 import { Input, Select, Switch, TextArea, Spinner } from '../../components';
-import { CreateClassOrParameterService, GenerateDtoService } from "../../services";
+import { CreateClassOrParameterService, GenerateDtoService, StringSearchService } from "../../services";
 import { Class, TechnologyDict } from '../../models';
 
 interface DtoGeneratorProps {
@@ -64,13 +64,24 @@ function DtoGenerator({ nameDtoValue, setNameDtoValue,
 
     const handleProcessClick = async () => {
         setLoading(true);
-        const lines = textAreaValue.split('\n').filter(e => !RegExp("сортировка|навигация", "i").test(e));
+
+        const lines = textAreaValue
+            .split('\n')
+            .filter(line => {
+                const trimmedLine = line.trim();
+                return (
+                    trimmedLine !== "" &&
+                    !/сортировка|навигация/i.test(trimmedLine) &&
+                    StringSearchService.validParts(trimmedLine.split(/\s+/))
+                );
+            });
+
         let parentClass: Class | null = null;
         let currentClass: Class | null = null;
         let stack: Class[] = [];
         let rootClassCreated = false;
-    
-        for (const line of lines.filter(item => item !== "")) {
+
+        for (const line of lines) {
             const parts = line.trim().split(/\s+/);
             const isObject = RegExp("объект").test(line);
             const isEnum = RegExp("перечисление").test(line);
