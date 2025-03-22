@@ -60,7 +60,7 @@ export class CreateClassOrParameterService {
         const i = parts.indexOf("время");
         if (i !== -1 && parts[i - 1] === "и" && parts[i - 2] === "дата") {
             parts[i] = "дата и время";
-            parts.splice(i - 2, 2); 
+            parts.splice(i - 2, 2);
             return TypeDict[parts[i]];
         }
         return null;

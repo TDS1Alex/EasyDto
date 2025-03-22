@@ -1,4 +1,4 @@
-import { Multiplicity, MultiplicityDict, TypeDict } from "../models";
+import { Multiplicity, MultiplicityDict, TypeDict, ValidationResult } from "../models";
 
 export class StringSearchService {
     //Получаем аттрибут максимальной длины из частей строки.
@@ -19,16 +19,43 @@ export class StringSearchService {
 
     /*
         Части строки валидны, если множественность и тип находятся рядом.
-        TODO: добавить в валидацию наличие названия поля.
     */
-    public static validParts(parts: string[]): boolean {
-        for(let i = 0; i < parts.length; i++) {
+    public static validParts(parts: string[]): ValidationResult {
+        const validationResult = new ValidationResult();
+        let i = parts.findIndex(part => TypeDict[part]) ?? 0;
+
+        for(i; i < parts.length; i++) {
             const part = parts[i];
-            if (MultiplicityDict[part] && TypeDict[parts[i-1]]) {
-                return true;
+            const type = TypeDict[part];
+            const name = type ? parts[i-1] : part;
+            const multiplicity = type ? MultiplicityDict[parts[i+1]] : MultiplicityDict[part];
+
+            if (type) {
+                validationResult.isTypeValid = true;
+            }
+
+            if (multiplicity) {
+                validationResult.isMultiplicityValid = true;
+            }
+
+            if (name && type && multiplicity) {
+                validationResult.isNameValid = true;
+            } else if (!name && type && multiplicity) {
+                validationResult.isNameValid = false;
+                return validationResult;
+            } else if (name && type && !multiplicity) {
+                validationResult.isNameValid = true;
+                return validationResult;
+            } else if (name && !type && !multiplicity) {
+                validationResult.isNameValid = true;
+                return validationResult;
+            }
+
+            if (validationResult.isNameValid && validationResult.isTypeValid && validationResult.isMultiplicityValid) {
+                validationResult.isLineValid = true;
             }
         }
-        return false;
+        return validationResult;
     }
 
     /*

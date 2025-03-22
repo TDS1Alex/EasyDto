@@ -65,23 +65,58 @@ function DtoGenerator({ nameDtoValue, setNameDtoValue,
     const handleProcessClick = async () => {
         setLoading(true);
 
-        const lines = textAreaValue
-            .split('\n')
-            .filter(line => {
-                const trimmedLine = line.trim();
-                return (
-                    trimmedLine !== "" &&
-                    !/сортировка|навигация/i.test(trimmedLine) &&
-                    StringSearchService.validParts(trimmedLine.split(/\s+/))
-                );
-            });
+        let lines = textAreaValue
+        .split('\n')
+        .filter(line => {
+            return (
+                line !== "" &&
+                !/сортировка|навигация/i.test(line)
+            );
+        });
+        
+        for(let i = 0; i < lines.length; i++) {
+            let parts = lines[i].split(/\s+/).filter(part => part !== '');
+            let validResult = StringSearchService.validParts(parts);
+            if (!validResult.isLineValid) {
+
+                if (validResult.isNameValid && !validResult.isTypeValid && !validResult.isMultiplicityValid) {
+                    for(let searchIndex = i; searchIndex < lines.length; searchIndex++) {
+                        const searchLine = lines[searchIndex];
+                        const searchParts = searchLine.split(/\s+/).filter(part => part !== '');
+                        const searchValidResult = StringSearchService.validParts(searchParts);
+                        if (!searchValidResult.isNameValid && searchValidResult.isTypeValid && searchValidResult.isMultiplicityValid) {
+                            lines[i] = lines[i].concat("", searchLine);
+                            lines.splice(searchIndex, 1);
+                            parts = lines[i].split(/\s+/).filter(part => part !== '');
+                            validResult = StringSearchService.validParts(parts);
+                        }
+                    }
+                } else if (validResult.isNameValid && validResult.isTypeValid && !validResult.isMultiplicityValid) {
+                    for(let searchIndex = i+1; searchIndex < lines.length; searchIndex++) {
+                        const searchLine = lines[searchIndex];
+                        const searchParts = searchLine.split(/\s+/).filter(part => part !== '');
+                        const searchValidResult = StringSearchService.validParts(searchParts);
+                        if (!searchValidResult.isNameValid && !searchValidResult.isTypeValid && searchValidResult.isMultiplicityValid) {
+                            lines[i] = lines[i].concat("", searchLine);
+                            lines.splice(searchIndex, 1);
+                            parts = lines[i].split(/\s+/).filter(part => part !== '');
+                            validResult = StringSearchService.validParts(parts);
+                        }
+                    }
+                }
+
+                if (!validResult.isLineValid) {
+                    lines.splice(i, 1);
+                }
+            }
+        }
 
         let parentClass: Class | null = null;
         let currentClass: Class | null = null;
         let stack: Class[] = [];
         let rootClassCreated = false;
 
-        for (const line of lines) {
+        for(const line of lines) {
             const parts = line.trim().split(/\s+/);
             const isObject = RegExp("объект").test(line);
             const isEnum = RegExp("перечисление").test(line);
