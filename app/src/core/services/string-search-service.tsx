@@ -50,10 +50,6 @@ export class StringSearchService {
                 validationResult.isNameValid = true;
                 return validationResult;
             }
-
-            if (validationResult.isNameValid && validationResult.isTypeValid && validationResult.isMultiplicityValid) {
-                validationResult.isLineValid = true;
-            }
         }
         return validationResult;
     }

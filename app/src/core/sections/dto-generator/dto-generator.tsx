@@ -80,7 +80,7 @@ function DtoGenerator({ nameDtoValue, setNameDtoValue,
             if (!validResult.isLineValid) {
 
                 if (validResult.isNameValid && !validResult.isTypeValid && !validResult.isMultiplicityValid) {
-                    for(let searchIndex = i; searchIndex < lines.length; searchIndex++) {
+                    for(let searchIndex = i+1; searchIndex < lines.length; searchIndex++) {
                         const searchLine = lines[searchIndex];
                         const searchParts = searchLine.split(/\s+/).filter(part => part !== '');
                         const searchValidResult = StringSearchService.validParts(searchParts);
