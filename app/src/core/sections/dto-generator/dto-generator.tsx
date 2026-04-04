@@ -10,19 +10,27 @@ import { Class, TechnologyDict } from '../../models';
 interface DtoGeneratorProps {
     nameDtoValue: string;
     setNameDtoValue: (value: string) => void;
+
     selectedTechnology: string;
     setSelectedTechnology: (value: string) => void;
+
     commentsEnabled: boolean;
     setCommentsEnabled: (value: boolean) => void;
+
     textAreaValue: string;
     setTextAreaValue: (value: string) => void;
+
     outputValue: string;
     setOutputValue: (value: string) => void;
+
+    isNameExist: boolean;
+    setIsNameExist: (value: boolean) => void
 }
 
 function DtoGenerator({ nameDtoValue, setNameDtoValue,
                         selectedTechnology, setSelectedTechnology,
                         commentsEnabled, setCommentsEnabled,
+                        isNameExist, setIsNameExist,
                         textAreaValue, setTextAreaValue,
                         outputValue, setOutputValue, 
     }: DtoGeneratorProps) {
@@ -60,6 +68,10 @@ function DtoGenerator({ nameDtoValue, setNameDtoValue,
 
     const handleToggle = () => {
         setCommentsEnabled(!commentsEnabled);
+    };
+
+    const handleNameToggle = () => {
+        setIsNameExist(!isNameExist);
     };
 
     const handleProcessClick = async () => {
@@ -134,16 +146,17 @@ function DtoGenerator({ nameDtoValue, setNameDtoValue,
             }
     
             if (isObject) {
-                currentClass = await CreateClassOrParameterService.createClass(parts, level);
+                currentClass = await CreateClassOrParameterService.createClass(parts, level, isNameExist);
                 stack.push(currentClass);
                 if (parentClass) {
                     parentClass.addObject(currentClass);
                 }
                 rootClassCreated = true;
             } else if (isEnum) {
-                await currentClass.addEnum(parts);
+                await currentClass.addEnum(parts, isNameExist);
             } else {
-                await currentClass.addParameter(parts);
+                console.log(isNameExist)
+                await currentClass.addParameter(parts, isNameExist);
             }
     
             parentClass = null;
@@ -179,7 +192,8 @@ function DtoGenerator({ nameDtoValue, setNameDtoValue,
             <div className={styles.inputContainer}>
                 <Input value={nameDtoValue} onChange={handleInputChange} placeholder="Напишите название ДТО"/>
                 <Select value={selectedTechnology} onChange={handleSelectChange} options={options}/>
-                <Switch checked={commentsEnabled} onChange={handleToggle} disabled={selectedTechnology !== 'CSharp'}/>
+                <Switch switchName="Коментарии" checked={commentsEnabled} onChange={handleToggle} disabled={selectedTechnology !== 'CSharp'}/>
+                <Switch switchName="Использовать готовые названия" checked={isNameExist} onChange={handleNameToggle}/>
             </div>
             <div className={styles.textAreaContainer}>
                 <TextArea value={textAreaValue} loading={loading} onChange={handleTextAreaChange} />

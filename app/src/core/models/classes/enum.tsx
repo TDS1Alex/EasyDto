@@ -1,19 +1,19 @@
 import { Multiplicity } from "../enums/multiplicity";
 
-export class Enum {
+export class Enum {  
     name: string;
-    translatedName: string;
     required: boolean = false;
     multiplicity: Multiplicity;
+    comment: string | null;
 
     constructor(name: string,
-                translatedName: string,
                 required: boolean,
-                multiplicityType: Multiplicity) 
+                multiplicityType: Multiplicity,
+                comment: string | null) 
     {
-        this.name =  name;
-        this.translatedName = translatedName;
+        this.name = name;
         this.required = required;
         this.multiplicity = multiplicityType;
+        this.comment =  comment;
     }
 }

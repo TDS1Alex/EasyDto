@@ -6,12 +6,12 @@ export class CSharpMapper {
 
         if (needComments) {
             let className: string = `/// <summary>\n`;
-            className += `/// ${currentClass.name}\n`;
+            className += `/// ${currentClass.comment}\n`;
             className += `/// </summary>\n`;
-            className += `public class ${currentClass.translatedName}\n{\n`;
+            className += `public class ${currentClass.name}\n{\n`;
             dtoText = className;
         } else {
-            dtoText = `public class ${currentClass.translatedName}\n{\n`;
+            dtoText = `public class ${currentClass.name}\n{\n`;
         }
         
         dtoText = this.generateParameters(currentClass.parameters, dtoText, needComments);
@@ -35,11 +35,11 @@ export class CSharpMapper {
             const attribute = new Attribute(param.required, isCollection, false, isIgnore, param.maxLenght);
 
             if (needComments) {
-                dtoText = this.getComment(param.name, dtoText);
+                dtoText = this.getComment(param.comment, dtoText);
             }
             
             dtoText += attribute.getAttribute();
-            dtoText += this.getProperty(param.translatedName, param.required, isCollection, false, false, param.type);
+            dtoText += this.getProperty(param.name, param.required, isCollection, false, false, param.type);
             dtoText = this.lineBreak(parameters, param, dtoText);
         });
 
@@ -53,11 +53,11 @@ export class CSharpMapper {
             const attribute = new Attribute(object.required, isCollection, true, false);
 
             if (needComments) {
-                dtoText = this.getComment(object.name, dtoText);
+                dtoText = this.getComment(object.comment, dtoText);
             }
           
             dtoText += attribute.getAttribute();
-            dtoText += this.getProperty(object.translatedName, true, isCollection, true);
+            dtoText += this.getProperty(object.name, true, isCollection, true);
             dtoText = this.lineBreak(objects, object, dtoText);
         });
 
@@ -71,18 +71,18 @@ export class CSharpMapper {
             const attribute = new Attribute(currentEnum.required, isCollection, true, false);
 
             if (needComments) {
-                dtoText = this.getComment(currentEnum.name, dtoText);
+                dtoText = this.getComment(currentEnum.comment, dtoText);
             }
 
             dtoText += attribute.getAttribute();
-            dtoText += this.getProperty(currentEnum.translatedName, currentEnum.required, isCollection, false, true);
+            dtoText += this.getProperty(currentEnum.name, currentEnum.required, isCollection, false, true);
             dtoText = this.lineBreak(enums, currentEnum, dtoText);
         });
 
         return dtoText;
     }
 
-    private static getComment(name: string, dtoText: string): string {
+    private static getComment(name: string | null, dtoText: string): string {
         const indent = '    ';
         dtoText += `${indent}/// <summary>\n`;
         dtoText += `${indent}/// ${name}\n`;

@@ -67,7 +67,7 @@ export class StringSearchService {
         Получение названия свойства из частей строки.
         Ищем название рядом с типом.
     */
-    public static getName(parts: string[], typeKey: string): string {
+    public static getComment(parts: string[], typeKey: string): string {
         const i = parts.lastIndexOf(typeKey);
         return parts.slice(0, i).join(' ').replace(/-/g, '').trim();
     }

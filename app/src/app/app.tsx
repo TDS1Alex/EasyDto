@@ -10,6 +10,7 @@ function App() {
   const [nameDtoValue, setNameDtoValue] = useState('');
   const [selectedTechnology, setSelectedTechnology] = useState('CSharp');
   const [commentsEnabled, setCommentsEnabled] = useState(false);
+  const [isNameExist, setIsNameExist] = useState(true);
   const [textAreaDtoGeneratorValue, setTextAreaDtoGeneratorValue] = useState('');
   const [outputValue, setOutputValue] = useState('');
 
@@ -35,6 +36,7 @@ function App() {
                 nameDtoValue={nameDtoValue} setNameDtoValue={setNameDtoValue}
                 selectedTechnology={selectedTechnology} setSelectedTechnology={setSelectedTechnology}
                 commentsEnabled={commentsEnabled} setCommentsEnabled={setCommentsEnabled}
+                isNameExist={isNameExist} setIsNameExist={setIsNameExist}
                 textAreaValue={textAreaDtoGeneratorValue} setTextAreaValue={setTextAreaDtoGeneratorValue}
                 outputValue={outputValue} setOutputValue={setOutputValue}
               />

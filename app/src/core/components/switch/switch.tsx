@@ -4,13 +4,14 @@ import React from 'react';
 interface SwitchProps {
     checked: boolean;
     onChange: () => void;
-    disabled: boolean;
+    disabled?: boolean;
+    switchName: string;
 }
 
-const Switch: React.FC<SwitchProps> = ({ checked, onChange, disabled }) => {
+const Switch: React.FC<SwitchProps> = ({ switchName, checked, onChange, disabled = false }) => {
     return (
         <div className='switch-container'>
-            <span>Комментарии</span>
+            <span>{switchName}</span>
             <label className="switch">
                 <input type="checkbox" checked={checked} onChange={onChange} disabled={disabled}/>
                 <span className="slider"></span>

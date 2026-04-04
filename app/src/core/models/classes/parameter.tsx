@@ -1,26 +1,26 @@
 import { Multiplicity } from "../enums/multiplicity";
 import { Type } from "../enums/type";
 
-export class Parameter {
+export class Parameter { 
     name: string;
-    translatedName: string;
     required: boolean = false;
     multiplicity: Multiplicity;
     type: Type;
     maxLenght: number | null;
+    comment: string | null;
 
     constructor(name: string,
-                translatedName: string,
                 required: boolean,
                 multiplicityType: Multiplicity,
                 parameterType: Type,
-                maxLenght: number | null) 
+                maxLenght: number | null,
+                comment: string | null) 
     {
-        this.name =  name;
-        this.translatedName = translatedName;
+        this.name = name;
         this.required = required;
         this.multiplicity = multiplicityType;
         this.type = parameterType;
         this.maxLenght = maxLenght;
+        this.comment =  comment;
     }
 }
