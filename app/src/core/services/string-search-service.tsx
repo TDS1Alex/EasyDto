@@ -68,7 +68,7 @@ export class StringSearchService {
         Ищем название рядом с типом.
     */
     public static getComment(parts: string[], typeKey: string): string {
-        const i = parts.lastIndexOf(typeKey);
+        const i = parts.indexOf(typeKey);
         return parts.slice(0, i).join(' ').replace(/-/g, '').trim();
     }
 }

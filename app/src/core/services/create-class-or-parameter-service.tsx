@@ -32,7 +32,7 @@ export class CreateClassOrParameterService {
         const name = await this.GetName(isNameExist, parts, multiplicityKeyIndex, comment);
         const required = parts.some(p => RegExp("^1").test(p));
         const multiplicity = StringSearchService.getMultiplicity(parts);
-        
+
         return new Enum(name, required, multiplicity, comment);
     }
 
@@ -40,7 +40,7 @@ export class CreateClassOrParameterService {
         const multiplicityKeyIndex = parts.findIndex(e => MultiplicityDict[e]);
         const afterKeyCount = isNameExist ? 2 : 1;
         let filteredParts = parts.slice(0, multiplicityKeyIndex + afterKeyCount);
-     
+        
         const multiplicity = StringSearchService.getMultiplicity(filteredParts);
         const maxLenght = StringSearchService.getMaxLenght(filteredParts);
 

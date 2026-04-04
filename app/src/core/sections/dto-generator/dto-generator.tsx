@@ -155,7 +155,6 @@ function DtoGenerator({ nameDtoValue, setNameDtoValue,
             } else if (isEnum) {
                 await currentClass.addEnum(parts, isNameExist);
             } else {
-                console.log(isNameExist)
                 await currentClass.addParameter(parts, isNameExist);
             }
     
