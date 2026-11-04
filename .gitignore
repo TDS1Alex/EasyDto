@@ -1,0 +1,8 @@
+# Python translator
+/ai-translator/__pycache__/
+/ai-translator/*.pyc
+/ai-translator/models/
+/ai-translator/.venv/
+/ai-translator/venv/
+/ai-translator/*.log
+/ai-translator/.pytest_cache/

@@ -1,0 +1,14 @@
+# EasyDTO Translator — зависимости
+# Версии зафиксированы по фактически установленному окружению (Python 3.12.7)
+flask==3.0.3
+flask-cors==5.0.0
+transformers==4.46.2
+torch==2.4.1
+tokenizers==0.20.0
+safetensors==0.4.5
+sentencepiece==0.2.0
+huggingface-hub==0.25.1
+numpy==2.1.1
+accelerate==1.1.1
+regex==2024.9.11
+tqdm==4.66.5
