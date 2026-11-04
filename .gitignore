@@ -6,3 +6,10 @@
 /ai-translator/venv/
 /ai-translator/*.log
 /ai-translator/.pytest_cache/
+
+# WPF desktop
+/desktop/bin/
+/desktop/obj/
+/desktop/.vs/
+/desktop/*.user
+/desktop/*.suo
