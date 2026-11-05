@@ -88,6 +88,7 @@ public partial class MainWindow : Window
                 _lifetime.Token);
 
             _translatorReady = true;
+            await NotifyWebUiServiceReadyAsync();
             HideStatus();
         }
         catch (OperationCanceledException)
@@ -129,6 +130,7 @@ public partial class MainWindow : Window
         core.Settings.IsStatusBarEnabled = false;
         core.Settings.AreDefaultContextMenusEnabled = false;
         core.Settings.IsZoomControlEnabled = false;
+        core.DownloadStarting += OnDownloadStarting;
 
         core.SetVirtualHostNameToFolderMapping(
             VirtualHostName,
@@ -159,6 +161,61 @@ public partial class MainWindow : Window
         }
 
         _webViewReady = true;
+        WebView.Focus();
+    }
+
+    private async Task NotifyWebUiServiceReadyAsync()
+    {
+        if (!_webViewReady || WebView.CoreWebView2 is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await WebView.CoreWebView2.ExecuteScriptAsync(
+                "window.dispatchEvent(new Event('easydto:service-ready'));");
+        }
+        catch (Exception)
+        {
+            // Интерфейс уже загружен; статус всё равно обновится периодической проверкой.
+        }
+    }
+
+    private static void OnDownloadStarting(object? sender, CoreWebView2DownloadStartingEventArgs args)
+    {
+        // Убираем встроенную панель загрузок WebView2 и сохраняем файл в «Загрузки».
+        try
+        {
+            var downloadsDirectory = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                "Downloads");
+            Directory.CreateDirectory(downloadsDirectory);
+
+            var suggestedName = string.IsNullOrWhiteSpace(args.ResultFilePath)
+                ? "easydto-download"
+                : Path.GetFileName(args.ResultFilePath);
+            var fileName = string.IsNullOrWhiteSpace(suggestedName) ? "easydto-download" : suggestedName;
+            var invalidChars = Path.GetInvalidFileNameChars();
+            fileName = string.Concat(fileName.Select(ch => invalidChars.Contains(ch) ? '_' : ch));
+
+            var candidate = Path.Combine(downloadsDirectory, fileName);
+            var stem = Path.GetFileNameWithoutExtension(fileName);
+            var extension = Path.GetExtension(fileName);
+
+            for (var index = 1; File.Exists(candidate); index++)
+            {
+                candidate = Path.Combine(downloadsDirectory, $"{stem} ({index}){extension}");
+            }
+
+            args.ResultFilePath = candidate;
+            args.Handled = true;
+        }
+        catch (Exception)
+        {
+            // Если сохранить в «Загрузки» не удалось, оставляем стандартное поведение WebView2.
+            args.Handled = false;
+        }
     }
 
     private void UpdateStatusDetail(string message)

@@ -1,10 +1,29 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru" data-theme="dark" data-accent="indigo">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <meta name="theme-color" content="#07090e" />
+    <meta name="color-scheme" content="dark light" />
+    <title>EasyDTO — DTO Studio</title>
+    <script>
+      (function () {
+        try {
+          var settings = JSON.parse(localStorage.getItem('easydto.ui.settings') || '{}');
+          var theme = settings.theme || 'dark';
+          var resolved = theme === 'system'
+            ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+            : theme;
+          document.documentElement.dataset.theme = resolved;
+          document.documentElement.dataset.accent = settings.accent || 'indigo';
+          document.documentElement.style.colorScheme = resolved;
+          document.documentElement.style.setProperty('--code-font-size', (settings.fontSize || 13) + 'px');
+        } catch (error) {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
