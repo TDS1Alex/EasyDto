@@ -6,7 +6,7 @@ export const TypeDict: { [key: string]: Type } = {
     "логический": Type.Bool,
     "дата и время": Type.DateTime,
     "дата": Type.Date,
-    "время": Type.Date,
+    "время": Type.DateTime,
     "guid": Type.Guid,
     "перечисление": Type.Enum,
     "объект": Type.Class

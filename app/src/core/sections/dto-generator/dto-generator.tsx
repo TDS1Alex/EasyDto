@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { CodeEditor, CodeView, getCodeStats, getLanguageMeta } from '../../../ui/code';
 import { Badge, Button, CopyButton, IconButton, Kbd, Segmented, Switch } from '../../../ui/components';
@@ -9,6 +9,7 @@ import { countLines, downloadText, pluralize } from '../../../ui/utils';
 import { type UiSettings } from '../../../ui/preferences';
 import { CreateClassOrParameterService, GenerateDtoService, StringSearchService } from '../../services';
 import { Class, TechnologyDict } from '../../models';
+import { buildRuleMap, type RuleSet } from '../../rules/rule-set';
 
 interface DtoGeneratorProps {
     nameDtoValue: string;
@@ -33,11 +34,19 @@ interface DtoGeneratorProps {
     onUpdateSettings: (patch: Partial<UiSettings>) => void;
     apiStatus: HealthStatus;
     onOpenHints: () => void;
+
+    ruleSet: RuleSet | null;
+    ruleSets: RuleSet[];
+    selectedRuleSetId: string;
+    defaultRuleSetId: string;
+    onSelectRuleSet: (id: string) => void;
+    onSetDefaultRuleSet: (id: string | null) => void;
+    onOpenRuleSets: () => void;
 }
 
 const EXAMPLE = `заявка объект 1 Application
 - ид заявки строка 1..* applicationId
-- создано дата 1 createdAt
+- дата создания дата и время 1 createdAt
 - сумма число 0..1 amount
 - организация объект 0..1 Organization
 - - наименование строка 1 name`;
@@ -65,10 +74,18 @@ function DtoGenerator({
     onUpdateSettings,
     apiStatus,
     onOpenHints,
+    ruleSet,
+    ruleSets,
+    selectedRuleSetId,
+    defaultRuleSetId,
+    onSelectRuleSet,
+    onSetDefaultRuleSet,
+    onOpenRuleSets,
 }: DtoGeneratorProps) {
     const [loading, setLoading] = useState(false);
     const toast = useToast();
 
+    const ruleMap = useMemo(() => buildRuleMap(ruleSet), [ruleSet]);
     const language = getLanguageMeta(selectedTechnology);
     const stats = getCodeStats(outputValue);
     const inputLineCount = countLines(textAreaValue);
@@ -134,7 +151,7 @@ function DtoGenerator({
                             const searchParts = searchLine.split(/\s+/).filter(part => part !== '');
                             const searchValidResult = StringSearchService.validParts(searchParts);
                             if (!searchValidResult.isNameValid && searchValidResult.isTypeValid && searchValidResult.isMultiplicityValid) {
-                                lines[i] = lines[i].concat('', searchLine);
+                                lines[i] = lines[i].concat(' ', searchLine);
                                 lines.splice(searchIndex, 1);
                                 parts = lines[i].split(/\s+/).filter(part => part !== '');
                                 validResult = StringSearchService.validParts(parts);
@@ -146,7 +163,7 @@ function DtoGenerator({
                             const searchParts = searchLine.split(/\s+/).filter(part => part !== '');
                             const searchValidResult = StringSearchService.validParts(searchParts);
                             if (!searchValidResult.isNameValid && !searchValidResult.isTypeValid && searchValidResult.isMultiplicityValid) {
-                                lines[i] = lines[i].concat('', searchLine);
+                                lines[i] = lines[i].concat(' ', searchLine);
                                 lines.splice(searchIndex, 1);
                                 parts = lines[i].split(/\s+/).filter(part => part !== '');
                                 validResult = StringSearchService.validParts(parts);
@@ -177,22 +194,22 @@ function DtoGenerator({
                 }
 
                 if (!isObject && !rootClassCreated) {
-                    currentClass = await CreateClassOrParameterService.createDefaultClass(nameDtoValue);
+                    currentClass = await CreateClassOrParameterService.createDefaultClass(nameDtoValue, ruleMap);
                     stack.push(currentClass);
                     rootClassCreated = true;
                 }
 
                 if (isObject) {
-                    currentClass = await CreateClassOrParameterService.createClass(parts, level, isNameExist);
+                    currentClass = await CreateClassOrParameterService.createClass(parts, level, isNameExist, ruleMap);
                     stack.push(currentClass);
                     if (parentClass) {
                         parentClass.addObject(currentClass);
                     }
                     rootClassCreated = true;
                 } else if (isEnum) {
-                    await currentClass.addEnum(parts, isNameExist);
+                    await currentClass.addEnum(parts, isNameExist, ruleMap);
                 } else {
-                    await currentClass.addParameter(parts, isNameExist);
+                    await currentClass.addParameter(parts, isNameExist, ruleMap);
                 }
 
                 parentClass = null;
@@ -292,8 +309,62 @@ function DtoGenerator({
                         checked={isNameExist}
                         onChange={setIsNameExist}
                         label="Готовые названия"
-                        description="Не переводить через ИИ"
+                        description="Имя из строки ввода"
                     />
+                </div>
+            </section>
+
+            <section className="ed-rules-bar" aria-label="Набор правил">
+                <div className="ed-rules-bar-info">
+                    <span className="ed-rules-bar-icon">
+                        <Icon name="layers" size={16} />
+                    </span>
+                    <div className="ed-rules-bar-copy">
+                        <span className="ed-rules-bar-title">Правила из набора</span>
+                        <span className="ed-rules-bar-subtitle">
+                            {ruleSet
+                                ? `${ruleSet.name} · ${ruleSet.rules.length} ${pluralize(ruleSet.rules.length, 'правило', 'правила', 'правил')}`
+                                : ruleSets.length > 0
+                                    ? 'Не выбран — имена будут переводиться ИИ'
+                                    : 'Наборов пока нет — можно создать во вкладке «Наборы правил»'}
+                        </span>
+                    </div>
+                </div>
+                <div className="ed-rules-bar-actions">
+                    <div className="ed-select-wrap">
+                        <select
+                            className="ed-select"
+                            value={selectedRuleSetId}
+                            aria-label="Выбрать набор правил"
+                            onChange={event => onSelectRuleSet(event.target.value)}
+                        >
+                            <option value="">Не выбрано</option>
+                            {ruleSets.map(item => (
+                                <option key={item.id} value={item.id}>{item.name}</option>
+                            ))}
+                        </select>
+                        <Icon name="chevronDown" size={14} className="ed-select-chevron" />
+                    </div>
+                    <IconButton
+                        icon="star"
+                        label={selectedRuleSetId !== '' && selectedRuleSetId === defaultRuleSetId
+                            ? 'Набор по умолчанию'
+                            : 'Сделать набором по умолчанию'}
+                        active={selectedRuleSetId !== '' && selectedRuleSetId === defaultRuleSetId}
+                        disabled={selectedRuleSetId === ''}
+                        onClick={() => onSetDefaultRuleSet(selectedRuleSetId)}
+                    />
+                    {ruleSet && (
+                        <Badge tone="accent">{ruleSet.rules.length}</Badge>
+                    )}
+                    <Button
+                        size="sm"
+                        variant="ghost"
+                        icon={ruleSets.length > 0 ? 'arrowRight' : 'plus'}
+                        onClick={onOpenRuleSets}
+                    >
+                        {ruleSets.length > 0 ? 'Управлять' : 'Создать набор'}
+                    </Button>
                 </div>
             </section>
 
@@ -333,7 +404,7 @@ function DtoGenerator({
                         <CodeEditor
                             value={textAreaValue}
                             onChange={setTextAreaValue}
-                            placeholder={`Например:\nзаявка объект 1 Application\n- ид заявки строка 1..* applicationId\n- сумма число 0..1 amount\n- организация объект 0..1 Organization\n- - наименование строка 1 name`}
+                            placeholder={`Например:\nзаявка объект 1 Application\n- ид заявки строка 1..* applicationId\n- дата создания дата и время 1 createdAt\n- сумма число 0..1 amount\n- организация объект 0..1 Organization\n- - наименование строка 1 name`}
                             onRun={() => void handleProcessClick()}
                             showLineNumbers={settings.lineNumbers}
                             ariaLabel="Описание структуры DTO"

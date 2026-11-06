@@ -88,10 +88,11 @@ function Hints({ onOpenGenerator }: HintsProps) {
 
 заявка объект 1 Application
 - ид заявки строка 1..* applicationId
+- дата создания дата и время 1 createdAt
 - сумма число 0..1 amount`} />
                     <ul className="ed-hint-list">
                         <li><b>описание</b> — русское название поля; используется в комментариях и для перевода ИИ.</li>
-                        <li><b>тип</b> — число, строка, логический, дата, время, guid, объект, перечисление.</li>
+                        <li><b>тип</b> — число, строка, логический, дата, дата и время, guid, объект, перечисление.</li>
                         <li><b>множественность</b> — 1, 0..1, 0..* или 1..*.</li>
                         <li><b>имя</b> — латинский идентификатор, необязателен при генерации имён через ИИ.</li>
                     </ul>
@@ -103,26 +104,32 @@ function Hints({ onOpenGenerator }: HintsProps) {
             title: 'Типы данных',
             icon: 'fileCode',
             wide: true,
-            keywords: 'типы число строка логический дата время guid c# typescript grpc',
+            keywords: 'типы число строка логический дата дата и время guid c# typescript grpc',
             body: (
-                <table className="ed-table">
-                    <thead>
-                        <tr>
-                            <th>В описании</th>
-                            <th>C#</th>
-                            <th>TypeScript</th>
-                            <th>gRPC</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>число</td><td>int</td><td>number</td><td>int32</td></tr>
-                        <tr><td>строка</td><td>string</td><td>string</td><td>string</td></tr>
-                        <tr><td>логический</td><td>bool</td><td>boolean</td><td>bool</td></tr>
-                        <tr><td>дата</td><td>DateOnly</td><td>Date</td><td>google.protobuf.Timestamp</td></tr>
-                        <tr><td>время</td><td>DateOnly</td><td>Date</td><td>google.protobuf.Timestamp</td></tr>
-                        <tr><td>guid</td><td>Guid</td><td>string</td><td>string</td></tr>
-                    </tbody>
-                </table>
+                <>
+                    <table className="ed-table">
+                        <thead>
+                            <tr>
+                                <th>В описании</th>
+                                <th>C#</th>
+                                <th>TypeScript</th>
+                                <th>gRPC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>число</td><td>int</td><td>number</td><td>int32</td></tr>
+                            <tr><td>строка</td><td>string</td><td>string</td><td>string</td></tr>
+                            <tr><td>логический</td><td>bool</td><td>boolean</td><td>bool</td></tr>
+                            <tr><td>дата</td><td>DateOnly</td><td>Date</td><td>google.protobuf.Timestamp</td></tr>
+                            <tr><td>дата и время</td><td>DateTimeOffset</td><td>Date</td><td>google.protobuf.Timestamp</td></tr>
+                            <tr><td>guid</td><td>Guid</td><td>string</td><td>string</td></tr>
+                        </tbody>
+                    </table>
+                    <p className="ed-hint-text" style={{ marginTop: 10 }}>
+                        Тип определяется словом перед множественностью, поэтому описание может
+                        содержать слова «дата» и «время».
+                    </p>
+                </>
             ),
         },
         {
@@ -186,12 +193,33 @@ function Hints({ onOpenGenerator }: HintsProps) {
                 <>
                     <p className="ed-hint-text">
                         С включённым переключателем «Готовые названия» приложение берёт последнее
-                        слово строки как имя. Без него имя переводится через Python-переводчик.
+                        слово строки как имя. Если имя не задано, применяется правило из выбранного
+                        набора, а затем перевод через Python-переводчик.
                     </p>
                     <ul className="ed-hint-list">
-                        <li>Готовые названия — быстрее и предсказуемее.</li>
-                        <li>Перевод ИИ — удобнее, если писать только по-русски.</li>
+                        <li>Готовые названия — самый высокий приоритет.</li>
+                        <li>Набор правил — точные соответствия без обращения к ИИ.</li>
+                        <li>Перевод ИИ — используется, если имени и правила нет.</li>
                         <li>Для перевода ИИ переводчик должен быть онлайн.</li>
+                    </ul>
+                </>
+            ),
+        },
+        {
+            id: 'rulesets',
+            title: 'Наборы правил',
+            icon: 'layers',
+            keywords: 'наборы правила маппинг импорт экспорт json поделиться',
+            body: (
+                <>
+                    <p className="ed-hint-text">
+                        Набор — это пары «описание → имя». Выберите набор в рабочей зоне или
+                        назначьте его по умолчанию во вкладке «Наборы правил».
+                    </p>
+                    <ul className="ed-hint-list">
+                        <li>Совпадение ищется по полному описанию без учёта регистра.</li>
+                        <li>Набор можно экспортировать в JSON и передать коллеге.</li>
+                        <li>Импорт создаёт новый набор и не перезаписывает существующие.</li>
                     </ul>
                 </>
             ),
@@ -232,7 +260,7 @@ function Hints({ onOpenGenerator }: HintsProps) {
                 <ul className="ed-hint-list">
                     <li>Строка без типа или множественности не попадает в результат.</li>
                     <li>Строки со словами «сортировка» и «навигация» игнорируются автоматически.</li>
-                    <li>Слова-типы в описании («дата создания») могут быть приняты за тип — используйте нейтральные описания.</li>
+                    <li>Тип должен стоять непосредственно перед множественностью: <span className="ed-code-inline">дата и время 0..1</span>.</li>
                     <li>Имя после множественности обязательно, если включены «Готовые названия».</li>
                     <li>Проверьте, что Python-переводчик запущен, если генерируете имена через ИИ.</li>
                 </ul>

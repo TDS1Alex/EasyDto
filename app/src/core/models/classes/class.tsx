@@ -2,6 +2,7 @@ import { CreateClassOrParameterService } from "../../services/create-class-or-pa
 import { Enum } from "./enum";
 import { Multiplicity } from "../enums/multiplicity";
 import { Parameter } from "./parameter";
+import type { RuleMap } from "../../rules/rule-set";
 
 export class Class {
     name: string;   
@@ -29,12 +30,12 @@ export class Class {
         this.enums = [];
     }
 
-    async addParameter(parts: string[], isNameExist: boolean) {
-        this.parameters.push(await CreateClassOrParameterService.createParameter(parts, isNameExist));
+    async addParameter(parts: string[], isNameExist: boolean, rules?: RuleMap) {
+        this.parameters.push(await CreateClassOrParameterService.createParameter(parts, isNameExist, rules));
     }
 
-    async addEnum(parts: string[], isNameExist: boolean) {
-        this.enums.push(await CreateClassOrParameterService.createEnum(parts, isNameExist));
+    async addEnum(parts: string[], isNameExist: boolean, rules?: RuleMap) {
+        this.enums.push(await CreateClassOrParameterService.createEnum(parts, isNameExist, rules));
     }
 
     addObject(object: Class) {

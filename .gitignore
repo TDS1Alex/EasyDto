@@ -13,3 +13,7 @@
 /desktop/.vs/
 /desktop/*.user
 /desktop/*.suo
+
+# EasyDTO local rule sets and settings (stored outside the repository)
+*.easydto-rules.json
+/settings.json

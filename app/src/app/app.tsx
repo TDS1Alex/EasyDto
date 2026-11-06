@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { DtoGenerator, Hints, Settings, TrainAi } from '../core/sections';
+import { DtoGenerator, Hints, RuleSets, Settings, TrainAi } from '../core/sections';
+import type { RuleSet } from '../core/rules/rule-set';
 import { Icon, type IconName } from '../ui/icons';
 import { ToastProvider } from '../ui/toast';
 import { useApiHealth, usePersistentState } from '../ui/hooks';
@@ -8,7 +9,7 @@ import { defaultSettings, type UiSettings } from '../ui/preferences';
 import { cx } from '../ui/utils';
 import './app.css';
 
-type SectionId = 'dto-generator' | 'train-ai' | 'hints' | 'settings';
+type SectionId = 'dto-generator' | 'train-ai' | 'rule-sets' | 'hints' | 'settings';
 
 interface SectionMeta {
     id: SectionId;
@@ -40,13 +41,22 @@ const sections: SectionMeta[] = [
         shortcut: '2',
     },
     {
+        id: 'rule-sets',
+        label: 'Наборы правил',
+        title: 'Наборы правил',
+        subtitle: 'Коллекции соответствий «описание → имя». Создавайте свои или обменивайтесь JSON-файлами.',
+        eyebrow: 'Библиотека',
+        icon: 'layers',
+        shortcut: '3',
+    },
+    {
         id: 'hints',
         label: 'Подсказки',
         title: 'Подсказки и синтаксис',
         subtitle: 'Короткий справочник по описанию структуры и работе с переводчиком.',
         eyebrow: 'База знаний',
         icon: 'book',
-        shortcut: '3',
+        shortcut: '4',
     },
     {
         id: 'settings',
@@ -55,7 +65,7 @@ const sections: SectionMeta[] = [
         subtitle: 'Оформление, редактор кода и состояние подключения к переводчику.',
         eyebrow: 'Персонализация',
         icon: 'sliders',
-        shortcut: '4',
+        shortcut: '5',
     },
 ];
 
@@ -84,11 +94,19 @@ function AppShell() {
         defaultSettings,
     );
 
+    // Наборы правил
+    const [ruleSets, setRuleSets] = usePersistentState<RuleSet[]>('easydto.ruleSets.v1', []);
+    const [defaultRuleSetId, setDefaultRuleSetId] = usePersistentState(
+        'easydto.rules.defaultId.v1',
+        '',
+    );
+    const [selectedRuleSetId, setSelectedRuleSetId] = useState(defaultRuleSetId);
+
     // Черновики рабочего пространства
     const [nameDtoValue, setNameDtoValue] = usePersistentState('easydto.dto.name', '');
     const [selectedTechnology, setSelectedTechnology] = usePersistentState('easydto.dto.technology', 'CSharp');
     const [commentsEnabled, setCommentsEnabled] = usePersistentState('easydto.dto.comments', false);
-    const [isNameExist, setIsNameExist] = usePersistentState('easydto.dto.readyNames', true);
+    const [isNameExist, setIsNameExist] = usePersistentState('easydto.dto.readyNames.v2', false);
     const [textAreaDtoGeneratorValue, setTextAreaDtoGeneratorValue] = usePersistentState('easydto.dto.input', '');
     const [outputValue, setOutputValue] = usePersistentState('easydto.dto.output', '');
     const [textAreaTrainAiValue, setTextAreaTrainAiValue] = usePersistentState('easydto.train.input', '');
@@ -142,6 +160,57 @@ function AppShell() {
     const resetSettings = useCallback(() => {
         setSettings(defaultSettings);
     }, [setSettings]);
+
+    const selectedRuleSet = useMemo(
+        () => ruleSets.find(ruleSet => ruleSet.id === selectedRuleSetId) ?? null,
+        [ruleSets, selectedRuleSetId],
+    );
+
+    useEffect(() => {
+        const ids = new Set(ruleSets.map(ruleSet => ruleSet.id));
+        const fallback = defaultRuleSetId && ids.has(defaultRuleSetId) ? defaultRuleSetId : '';
+
+        if (defaultRuleSetId && !ids.has(defaultRuleSetId)) {
+            setDefaultRuleSetId('');
+        }
+
+        if (selectedRuleSetId && !ids.has(selectedRuleSetId)) {
+            setSelectedRuleSetId(fallback);
+        }
+    }, [ruleSets, defaultRuleSetId, selectedRuleSetId, setDefaultRuleSetId]);
+
+    const handleCreateRuleSet = useCallback((ruleSet: RuleSet) => {
+        setRuleSets(current => [ruleSet, ...current]);
+        setSelectedRuleSetId(ruleSet.id);
+    }, [setRuleSets]);
+
+    const handleUpdateRuleSet = useCallback((ruleSet: RuleSet) => {
+        setRuleSets(current => current.map(item => item.id === ruleSet.id ? ruleSet : item));
+    }, [setRuleSets]);
+
+    const handleDeleteRuleSet = useCallback((id: string) => {
+        setRuleSets(current => current.filter(item => item.id !== id));
+
+        if (defaultRuleSetId === id) {
+            setDefaultRuleSetId('');
+        }
+
+        if (selectedRuleSetId === id) {
+            const fallback = defaultRuleSetId && defaultRuleSetId !== id ? defaultRuleSetId : '';
+            setSelectedRuleSetId(fallback);
+        }
+    }, [defaultRuleSetId, selectedRuleSetId, setDefaultRuleSetId, setRuleSets]);
+
+    const handleSetDefaultRuleSet = useCallback((id: string | null) => {
+        const value = id && ruleSets.some(ruleSet => ruleSet.id === id) ? id : '';
+        setDefaultRuleSetId(value);
+        setSelectedRuleSetId(value);
+    }, [ruleSets, setDefaultRuleSetId]);
+
+    const handleImportRuleSet = useCallback((ruleSet: RuleSet) => {
+        setRuleSets(current => [ruleSet, ...current]);
+        setSelectedRuleSetId(ruleSet.id);
+    }, [setRuleSets]);
 
     const toggleTheme = () => {
         updateSettings({ theme: resolvedTheme === 'dark' ? 'light' : 'dark' });
@@ -269,6 +338,13 @@ function AppShell() {
                                 onUpdateSettings={updateSettings}
                                 apiStatus={apiHealth.status}
                                 onOpenHints={() => setActiveSection('hints')}
+                                ruleSet={selectedRuleSet}
+                                ruleSets={ruleSets}
+                                selectedRuleSetId={selectedRuleSetId}
+                                defaultRuleSetId={defaultRuleSetId}
+                                onSelectRuleSet={setSelectedRuleSetId}
+                                onSetDefaultRuleSet={handleSetDefaultRuleSet}
+                                onOpenRuleSets={() => setActiveSection('rule-sets')}
                             />
                         )}
                         {activeSection === 'train-ai' && (
@@ -277,6 +353,17 @@ function AppShell() {
                                 setTextAreaValue={setTextAreaTrainAiValue}
                                 apiStatus={apiHealth.status}
                                 onCheckApi={() => apiHealth.check(true)}
+                            />
+                        )}
+                        {activeSection === 'rule-sets' && (
+                            <RuleSets
+                                ruleSets={ruleSets}
+                                defaultRuleSetId={defaultRuleSetId}
+                                onCreate={handleCreateRuleSet}
+                                onUpdate={handleUpdateRuleSet}
+                                onDelete={handleDeleteRuleSet}
+                                onSetDefault={handleSetDefaultRuleSet}
+                                onImport={handleImportRuleSet}
                             />
                         )}
                         {activeSection === 'hints' && (

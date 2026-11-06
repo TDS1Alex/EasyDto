@@ -38,7 +38,10 @@ export type IconName =
     | 'box'
     | 'plus'
     | 'wrapText'
-    | 'loader';
+    | 'loader'
+    | 'star'
+    | 'upload'
+    | 'pencil';
 
 interface IconProps extends Omit<SVGProps<SVGSVGElement>, 'name'> {
     name: IconName;
@@ -254,6 +257,22 @@ function content(name: IconName): ReactNode {
             );
         case 'loader':
             return <path d="M21 12a9 9 0 1 1-6.22-8.56" />;
+        case 'star':
+            return <path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3-6.2 3.3L7 14.2 2 9.3l6.9-1L12 2Z" />;
+        case 'upload':
+            return (
+                <>
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <path d="m17 8-5-5-5 5M12 3v12" />
+                </>
+            );
+        case 'pencil':
+            return (
+                <>
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                </>
+            );
         default:
             return null;
     }
