@@ -12,7 +12,7 @@ export interface UiSettings {
 }
 
 export const defaultSettings: UiSettings = {
-    theme: 'dark',
+    theme: 'system',
     accent: 'indigo',
     density: 'comfortable',
     fontSize: 13,
