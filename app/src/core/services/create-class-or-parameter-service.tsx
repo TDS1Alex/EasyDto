@@ -1,6 +1,7 @@
-import { Class, Parameter, Enum, Multiplicity, MultiplicityDict } from "../models";
+import { Class, Parameter, Enum, EnumValue, Multiplicity, MultiplicityDict } from "../models";
 import { normalizeRuleSource, type RuleMap } from "../rules/rule-set";
 import { AiService } from "./ai-service";
+import { EnumService } from "./enum-service";
 import { StringSearchService } from "./string-search-service";
 
 export class CreateClassOrParameterService {
@@ -30,7 +31,7 @@ export class CreateClassOrParameterService {
         return new Class(name, required, multiplicity, comment, level);
     }
 
-    public static async createEnum(parts: string[], isNameExist: boolean, rules?: RuleMap): Promise<Enum> {
+    public static async createEnum(parts: string[], isNameExist: boolean, rules?: RuleMap, values: EnumValue[] = []): Promise<Enum> {
         const multiplicityKeyIndex = parts.findIndex(e => MultiplicityDict[e]);
 
         const comment = StringSearchService.getComment(parts, 'перечисление');
@@ -38,7 +39,35 @@ export class CreateClassOrParameterService {
         const required = parts.some(p => RegExp("^1").test(p));
         const multiplicity = StringSearchService.getMultiplicity(parts);
 
-        return new Enum(name, required, multiplicity, comment);
+        return new Enum(name, required, multiplicity, comment, values);
+    }
+
+    /*
+        Создаёт отдельное перечисление по таблице СА, когда в описании
+        нет строки-объявления DTO. Имя берётся из поля «Имя DTO»,
+        затем из набора правил, затем переводится ИИ.
+    */
+    public static async createEnumFromTable(
+        title: string,
+        values: EnumValue[],
+        explicitName: string,
+        rules?: RuleMap,
+    ): Promise<Enum> {
+        const comment = EnumService.getEnumComment(title);
+        let name = explicitName.trim();
+
+        if (!name) {
+            const ruleName = rules?.get(normalizeRuleSource(comment));
+            if (ruleName) {
+                name = ruleName;
+            } else if (comment) {
+                name = this.mergeWords(await AiService.translateName(comment));
+            } else {
+                name = 'Enum';
+            }
+        }
+
+        return new Enum(name, false, Multiplicity.Singular, comment, values);
     }
 
     public static async createParameter(parts: string[], isNameExist: boolean, rules?: RuleMap): Promise<Parameter> {

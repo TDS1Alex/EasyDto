@@ -7,7 +7,7 @@ import { useToast } from '../../../ui/toast';
 import { type HealthStatus } from '../../../ui/hooks';
 import { countLines, downloadText, pluralize } from '../../../ui/utils';
 import { type UiSettings } from '../../../ui/preferences';
-import { CreateClassOrParameterService, GenerateDtoService, StringSearchService } from '../../services';
+import { CreateClassOrParameterService, EnumService, GenerateDtoService, StringSearchService } from '../../services';
 import { Class, TechnologyDict } from '../../models';
 import { buildRuleMap, type RuleSet } from '../../rules/rule-set';
 
@@ -34,6 +34,7 @@ interface DtoGeneratorProps {
     onUpdateSettings: (patch: Partial<UiSettings>) => void;
     apiStatus: HealthStatus;
     onOpenHints: () => void;
+    onOpenEnums: () => void;
 
     ruleSet: RuleSet | null;
     ruleSets: RuleSet[];
@@ -74,6 +75,7 @@ function DtoGenerator({
     onUpdateSettings,
     apiStatus,
     onOpenHints,
+    onOpenEnums,
     ruleSet,
     ruleSets,
     selectedRuleSetId,
@@ -132,14 +134,17 @@ function DtoGenerator({
         setLoading(true);
 
         try {
+            if (textAreaValue.split('\n').some(line => EnumService.isEnumValueRow(line))) {
+                toast.push({
+                    kind: 'info',
+                    title: 'Таблицы перечислений пропущены',
+                    message: 'Сгенерируйте их на странице «Перечисления».',
+                });
+            }
+
             let lines = textAreaValue
                 .split('\n')
-                .filter(line => {
-                    return (
-                        line !== '' &&
-                        !/сортировка|навигация/i.test(line)
-                    );
-                });
+                .filter(line => line !== '' && !/сортировка|навигация/i.test(line));
 
             for (let i = 0; i < lines.length; i++) {
                 let parts = lines[i].split(/\s+/).filter(part => part !== '');
@@ -176,6 +181,9 @@ function DtoGenerator({
                     }
                 }
             }
+
+            // Строки таблиц перечислений не участвуют в разборе DTO.
+            lines = lines.filter(line => !EnumService.isEnumValueRow(line));
 
             let parentClass: Class | null = null;
             let currentClass: Class | null = null;
@@ -215,10 +223,21 @@ function DtoGenerator({
                 parentClass = null;
             }
 
+            if (stack.length === 0) {
+                setOutputValue('');
+                toast.push({
+                    kind: 'info',
+                    title: 'Код не сформирован',
+                    message: 'Добавьте хотя бы один объект или поле.',
+                });
+                return;
+            }
+
             const result = await GenerateDtoService.generateAllDto(
                 stack,
                 TechnologyDict[selectedTechnology],
                 commentsEnabled,
+                false,
             );
             setOutputValue(result);
 
@@ -420,7 +439,11 @@ function DtoGenerator({
                     <footer className="ed-panel-foot">
                         <span>Формат:</span>
                         <code>описание тип 0..1 [имя]</code>
-                        <button type="button" className="ed-link-btn ed-foot-spacer" onClick={onOpenHints}>
+                        <span className="ed-foot-spacer" />
+                        <button type="button" className="ed-link-btn" onClick={onOpenEnums}>
+                            Перечисления
+                        </button>
+                        <button type="button" className="ed-link-btn" onClick={onOpenHints}>
                             Синтаксис
                         </button>
                     </footer>

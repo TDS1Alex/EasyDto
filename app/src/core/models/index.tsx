@@ -1,6 +1,7 @@
 //Классы
 export * from './classes/class';
 export * from './classes/enum';
+export * from './classes/enum-value';
 export * from './classes/attribute';
 export * from './classes/parameter';
 export * from './classes/validation-result';

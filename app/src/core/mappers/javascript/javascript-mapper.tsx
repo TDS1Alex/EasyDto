@@ -1,8 +1,9 @@
-import { Class, Multiplicity, Type } from "../../models";
+import { Class, Enum, Multiplicity, Type } from "../../models";
 import { JavaScriptTypeDict } from "./javascript-type-dict";
 
 export class JavaScriptMapper {
-    public static generateJavaScriptDto(currentClass: Class, dtoText: string) {
+    public static generateJavaScriptDto(currentClass: Class, dtoText: string,
+        includeEnumDeclarations: boolean = true) {
         const isObjectExist = currentClass.objects && currentClass.objects.length != 0;
         const isEnumExist = currentClass.enums && currentClass.enums.length != 0;
 
@@ -33,6 +34,36 @@ export class JavaScriptMapper {
         }
 
         dtoText += `}\n\n`;
+
+        if (includeEnumDeclarations && isEnumExist) {
+            dtoText += this.generateEnumDeclarations(currentClass.enums);
+        }
+
+        return dtoText;
+    }
+
+    /*
+        Генерация только перечислений — используется, когда на вход
+        подана одна таблица перечисления без описания DTO.
+    */
+    public static generateJavaScriptEnums(enums: Enum[]): string {
+        return this.generateEnumDeclarations(enums);
+    }
+
+    private static generateEnumDeclarations(enums: Enum[]): string {
+        let dtoText = '';
+
+        enums.forEach(currentEnum => {
+            dtoText += `export enum ${currentEnum.name} {\n`;
+
+            currentEnum.values.forEach((value, index) => {
+                dtoText += `    ${value.name} = ${value.value}`;
+                dtoText += index !== currentEnum.values.length - 1 ? ',\n' : '\n';
+            });
+
+            dtoText += `}\n\n`;
+        });
+
         return dtoText;
     }
 

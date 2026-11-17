@@ -1,9 +1,10 @@
-import { Class, Multiplicity, Type } from "../../models";
+import { Class, Enum, Multiplicity, Type } from "../../models";
 import { GrpcRequiredTypeDict } from "./grpc-required-type-dict";
 import { GrpcNoRequiredTypeDict } from "./grpc-no-required-type-dict";
 
 export class GrpcMapper {
-    public static generateGrpcDto(currentClass: Class, dtoText: string) {
+    public static generateGrpcDto(currentClass: Class, dtoText: string,
+        includeEnumDeclarations: boolean = true) {
         const isObjectExist = currentClass.objects && currentClass.objects.length != 0;
         const isEnumExist = currentClass.enums && currentClass.enums.length != 0;
 
@@ -38,7 +39,43 @@ export class GrpcMapper {
         }
 
         dtoText += `}\n\n`;
+
+        if (includeEnumDeclarations && isEnumExist) {
+            dtoText = this.generateEnumDeclarations(currentClass.enums, dtoText);
+        }
+
         return dtoText;
+    }
+
+    /*
+        Генерация только перечислений — используется, когда на вход
+        подана одна таблица перечисления без описания DTO.
+    */
+    public static generateGrpcEnums(enums: Enum[]): string {
+        return this.generateEnumDeclarations(enums, '');
+    }
+
+    private static generateEnumDeclarations(enums: Enum[], dtoText: string): string {
+        enums.forEach(currentEnum => {
+            const prefix = this.toUpperSnake(currentEnum.name);
+            dtoText += `enum ${currentEnum.name} {\n`;
+
+            currentEnum.values.forEach(value => {
+                dtoText += `    ${prefix}_${value.name.toUpperCase()} = ${value.value};\n`;
+            });
+
+            dtoText += `}\n\n`;
+        });
+
+        return dtoText;
+    }
+
+    private static toUpperSnake(value: string): string {
+        return value
+            .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+            .replace(/[^A-Za-z0-9]+/g, '_')
+            .replace(/^_+|_+$/g, '')
+            .toUpperCase();
     }
 
     private static getProperty(name: string, index: number, isCollection: boolean, isObject: boolean,

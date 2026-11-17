@@ -8,6 +8,7 @@ import { copyText, cx, pluralize } from '../../../ui/utils';
 
 interface HintsProps {
     onOpenGenerator: () => void;
+    onOpenEnums: () => void;
 }
 
 function Snippet({ code, language }: { code: string; language?: string }) {
@@ -47,7 +48,7 @@ interface HintCardData {
     body: ReactNode;
 }
 
-function Hints({ onOpenGenerator }: HintsProps) {
+function Hints({ onOpenGenerator, onOpenEnums }: HintsProps) {
     const [query, setQuery] = useState('');
 
     const cards = useMemo<HintCardData[]>(() => [
@@ -65,8 +66,9 @@ function Hints({ onOpenGenerator }: HintsProps) {
                     </p>
                     <ol className="ed-hint-list">
                         <li>Введите имя DTO и выберите технологию: C#, TypeScript или gRPC.</li>
-                        <li>Опишите поля, объекты и перечисления в левом редакторе.</li>
-                        <li>Нажмите «Сгенерировать DTO» или <span className="ed-code-inline">Ctrl + Enter</span>.</li>
+                        <li>Опишите поля и объекты в генераторе DTO.</li>
+                        <li>Перечисления сгенерируйте на отдельной странице «Перечисления».</li>
+                        <li>Нажмите «Сгенерировать» или <span className="ed-code-inline">Ctrl + Enter</span>.</li>
                         <li>Скопируйте результат или скачайте готовый файл.</li>
                     </ol>
                 </>
@@ -173,14 +175,37 @@ function Hints({ onOpenGenerator }: HintsProps) {
             id: 'enums',
             title: 'Перечисления',
             icon: 'braces',
-            keywords: 'перечисление enum статус',
+            wide: true,
+            keywords: 'перечисление enum статус таблица отдельная страница',
             body: (
                 <>
                     <p className="ed-hint-text">
-                        Ключевое слово <span className="ed-code-inline">перечисление</span> создаёт enum
-                        внутри текущего объекта.
+                        Перечисления генерируются на отдельной странице — таблицы значений
+                        больше не смешиваются с описанием DTO.
                     </p>
-                    <Snippet code={`- статус перечисление 0..1 ApplicationStatus`} />
+                    <Snippet code={`Статус заявки
+0  Undefined  Не определен
+1  Draft      Черновик
+2  Sent       Отправлена
+
+Тип оплаты
+0  Undefined  Не определен
+1  Card       Банковская карта
+2  Cash       Наличные`} />
+                    <ul className="ed-hint-list">
+                        <li>Первое число — номер строки таблицы, он игнорируется.</li>
+                        <li><b>Undefined = 0</b> добавляется автоматически.</li>
+                        <li>Остальные значения нумеруются с 1 в порядке таблицы.</li>
+                        <li>Несколько таблиц подряд превращаются в несколько enum.</li>
+                        <li>
+                            Имя берётся из поля «Имя перечисления» (для одной таблицы),
+                            набора правил или переводится по заголовку таблицы.
+                        </li>
+                        <li>
+                            В DTO укажите поле как <span className="ed-code-inline">- статус перечисление 0..1 ApplicationStatus</span>,
+                            а сам enum сгенерируйте на отдельной странице.
+                        </li>
+                    </ul>
                 </>
             ),
         },
@@ -324,11 +349,16 @@ function Hints({ onOpenGenerator }: HintsProps) {
             <div className="ed-hints-cta">
                 <div>
                     <strong>Готовы попробовать?</strong>
-                    <span>Вернитесь в генератор — там уже открыт редактор структуры.</span>
+                    <span>Опишите структуру DTO или вставьте таблицы перечислений.</span>
                 </div>
-                <Button variant="primary" icon="sparkles" onClick={onOpenGenerator}>
-                    К генератору
-                </Button>
+                <div className="ed-hints-cta-actions">
+                    <Button variant="secondary" icon="braces" onClick={onOpenEnums}>
+                        К перечислениям
+                    </Button>
+                    <Button variant="primary" icon="sparkles" onClick={onOpenGenerator}>
+                        К генератору DTO
+                    </Button>
+                </div>
             </div>
         </div>
     );

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { DtoGenerator, Hints, RuleSets, Settings, TrainAi } from '../core/sections';
+import { DtoGenerator, EnumGenerator, Hints, RuleSets, Settings, TrainAi } from '../core/sections';
 import type { RuleSet } from '../core/rules/rule-set';
 import { Icon, type IconName } from '../ui/icons';
 import { ToastProvider } from '../ui/toast';
@@ -9,7 +9,7 @@ import { defaultSettings, type UiSettings } from '../ui/preferences';
 import { cx } from '../ui/utils';
 import './app.css';
 
-type SectionId = 'dto-generator' | 'train-ai' | 'rule-sets' | 'hints' | 'settings';
+type SectionId = 'dto-generator' | 'enum-generator' | 'train-ai' | 'rule-sets' | 'hints' | 'settings';
 
 interface SectionMeta {
     id: SectionId;
@@ -32,13 +32,22 @@ const sections: SectionMeta[] = [
         shortcut: '1',
     },
     {
+        id: 'enum-generator',
+        label: 'Перечисления',
+        title: 'Генератор перечислений',
+        subtitle: 'Вставьте таблицы значений — получите готовые enum для C#, TypeScript или gRPC.',
+        eyebrow: 'Рабочее пространство',
+        icon: 'braces',
+        shortcut: '2',
+    },
+    {
         id: 'train-ai',
         label: 'Обучение ИИ',
         title: 'Обучение ИИ',
         subtitle: 'Добавьте примеры переводов, чтобы переводчик лучше понимал предметную область.',
         eyebrow: 'ИИ-переводчик',
         icon: 'brain',
-        shortcut: '2',
+        shortcut: '3',
     },
     {
         id: 'rule-sets',
@@ -47,7 +56,7 @@ const sections: SectionMeta[] = [
         subtitle: 'Коллекции соответствий «описание → имя». Создавайте свои или обменивайтесь JSON-файлами.',
         eyebrow: 'Библиотека',
         icon: 'layers',
-        shortcut: '3',
+        shortcut: '4',
     },
     {
         id: 'hints',
@@ -56,7 +65,7 @@ const sections: SectionMeta[] = [
         subtitle: 'Короткий справочник по описанию структуры и работе с переводчиком.',
         eyebrow: 'База знаний',
         icon: 'book',
-        shortcut: '4',
+        shortcut: '5',
     },
     {
         id: 'settings',
@@ -65,7 +74,7 @@ const sections: SectionMeta[] = [
         subtitle: 'Оформление, редактор кода и состояние подключения к переводчику.',
         eyebrow: 'Персонализация',
         icon: 'sliders',
-        shortcut: '5',
+        shortcut: '6',
     },
 ];
 
@@ -110,6 +119,13 @@ function AppShell() {
     const [textAreaDtoGeneratorValue, setTextAreaDtoGeneratorValue] = usePersistentState('easydto.dto.input', '');
     const [outputValue, setOutputValue] = usePersistentState('easydto.dto.output', '');
     const [textAreaTrainAiValue, setTextAreaTrainAiValue] = usePersistentState('easydto.train.input', '');
+
+    // Черновики генератора перечислений
+    const [enumNameValue, setEnumNameValue] = usePersistentState('easydto.enum.name', '');
+    const [enumTechnology, setEnumTechnology] = usePersistentState('easydto.enum.technology', 'CSharp');
+    const [enumCommentsEnabled, setEnumCommentsEnabled] = usePersistentState('easydto.enum.comments', false);
+    const [textAreaEnumGeneratorValue, setTextAreaEnumGeneratorValue] = usePersistentState('easydto.enum.input', '');
+    const [enumOutputValue, setEnumOutputValue] = usePersistentState('easydto.enum.output', '');
 
     const systemDark = useSystemDark();
     const resolvedTheme = settings.theme === 'system'
@@ -338,6 +354,7 @@ function AppShell() {
                                 onUpdateSettings={updateSettings}
                                 apiStatus={apiHealth.status}
                                 onOpenHints={() => setActiveSection('hints')}
+                                onOpenEnums={() => setActiveSection('enum-generator')}
                                 ruleSet={selectedRuleSet}
                                 ruleSets={ruleSets}
                                 selectedRuleSetId={selectedRuleSetId}
@@ -345,6 +362,25 @@ function AppShell() {
                                 onSelectRuleSet={setSelectedRuleSetId}
                                 onSetDefaultRuleSet={handleSetDefaultRuleSet}
                                 onOpenRuleSets={() => setActiveSection('rule-sets')}
+                            />
+                        )}
+                        {activeSection === 'enum-generator' && (
+                            <EnumGenerator
+                                nameValue={enumNameValue}
+                                setNameValue={setEnumNameValue}
+                                selectedTechnology={enumTechnology}
+                                setSelectedTechnology={setEnumTechnology}
+                                commentsEnabled={enumCommentsEnabled}
+                                setCommentsEnabled={setEnumCommentsEnabled}
+                                textAreaValue={textAreaEnumGeneratorValue}
+                                setTextAreaValue={setTextAreaEnumGeneratorValue}
+                                outputValue={enumOutputValue}
+                                setOutputValue={setEnumOutputValue}
+                                settings={settings}
+                                onUpdateSettings={updateSettings}
+                                apiStatus={apiHealth.status}
+                                onOpenHints={() => setActiveSection('hints')}
+                                ruleSet={selectedRuleSet}
                             />
                         )}
                         {activeSection === 'train-ai' && (
@@ -367,7 +403,10 @@ function AppShell() {
                             />
                         )}
                         {activeSection === 'hints' && (
-                            <Hints onOpenGenerator={() => setActiveSection('dto-generator')} />
+                            <Hints
+                                onOpenGenerator={() => setActiveSection('dto-generator')}
+                                onOpenEnums={() => setActiveSection('enum-generator')}
+                            />
                         )}
                         {activeSection === 'settings' && (
                             <Settings

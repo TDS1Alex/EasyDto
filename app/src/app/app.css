@@ -597,6 +597,11 @@
     box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+.ed-input:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
 .ed-input--with-icon {
     padding-left: 38px;
 }
@@ -1711,6 +1716,13 @@
     font-size: 11.5px;
 }
 
+.ed-hints-cta-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 /* ============================================================
    Settings
    ============================================================ */
@@ -2790,6 +2802,15 @@
     .ed-settings-footer {
         align-items: stretch;
         flex-direction: column;
+    }
+
+    .ed-hints-cta {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .ed-hints-cta-actions {
+        width: 100%;
     }
 }
 
